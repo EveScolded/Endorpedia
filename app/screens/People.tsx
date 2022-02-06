@@ -6,6 +6,9 @@ import {
   View,
   StyleSheet,
   TouchableOpacity,
+  TextInput,
+  Image,
+  TouchableHighlight,
 } from "react-native";
 import { Person } from "../model/person";
 import { DataSW } from "../model/data";
@@ -17,6 +20,7 @@ interface State {
   data: Person[];
   isLoading: boolean;
   nextURL: string;
+  search: string;
 }
 
 export default class People extends Component<{}, State> {
@@ -32,6 +36,7 @@ export default class People extends Component<{}, State> {
       data: [],
       isLoading: true,
       nextURL: "",
+      search: "",
     };
   }
 
@@ -58,6 +63,17 @@ export default class People extends Component<{}, State> {
     }
   };
 
+  private getPerson = async () => {
+    try {
+      const response: DataSW<Person> = await this.peopleService.searchPeople(
+        this.state.search
+      );
+      this.setState({ data: response.results });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   componentDidMount() {
     this.getPeople();
   }
@@ -67,14 +83,35 @@ export default class People extends Component<{}, State> {
 
     return (
       <View style={styles.container}>
+        <View style={styles.inputContainer}>
+          <TextInput
+            placeholder="name"
+            style={styles.inputStyle}
+            onChangeText={(search) => this.setState({ search })}
+          />
+          <TouchableHighlight onPress={this.getPerson}>
+            <Image
+              style={styles.imageStyle}
+              source={require("../assets/searchIcon.png")}
+            />
+          </TouchableHighlight>
+        </View>
+
         {isLoading ? (
           <ActivityIndicator />
         ) : (
           <FlatList
+            columnWrapperStyle={{ justifyContent: "space-between" }}
+            numColumns={2}
             data={data}
             keyExtractor={(item) => item.url}
             renderItem={({ item }) => (
-              <Text style={styles.item}>{item.name}</Text>
+              <View style={styles.itemsList}>
+                <Text style={styles.item}>{item.name}</Text>
+                <Text style={styles.item}>Gender: {item.gender}</Text>
+                <Text style={styles.item}>Birth year: {item.birth_year}</Text>
+                <Text style={styles.item}>Height: {item.height} cm</Text>
+              </View>
             )}
           />
         )}
@@ -89,20 +126,42 @@ export default class People extends Component<{}, State> {
 }
 
 const styles = StyleSheet.create({
+  inputContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    borderBottomWidth: 1,
+    backgroundColor: "gray",
+    width: 200,
+    height: 50,
+    margin: 6,
+    padding: 15,
+    fontWeight: "bold",
+    color: "#fff",
+  },
+  inputStyle: { flex: 1 },
+  imageStyle: {
+    margin: 3,
+    height: 15,
+    width: 15,
+    resizeMode: "stretch",
+    alignItems: "center",
+  },
   container: {
     flex: 1,
     backgroundColor: "#000000",
     color: "#fff",
     alignItems: "center",
   },
-  item: {
+  itemsList: {
     textAlign: "center",
     borderColor: "#fff",
     borderWidth: 1,
-    width: 200,
-    height: 50,
+    width: "45%",
+    height: 100,
     margin: 6,
     padding: 15,
+  },
+  item: {
     fontWeight: "bold",
     color: "#fff",
   },
