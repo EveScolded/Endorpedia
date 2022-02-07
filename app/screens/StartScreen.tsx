@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import colors from "../config/colors";
 
 export default function StartScreen({ navigation }) {
   return (
@@ -36,8 +37,8 @@ export default function StartScreen({ navigation }) {
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    backgroundColor: "#000000",
-    color: "#fff",
+    backgroundColor: colors.mainBackground,
+    color: colors.textWhite,
     alignItems: "center",
   },
   container: {
@@ -46,19 +47,19 @@ const styles = StyleSheet.create({
   },
   text: {
     textAlign: "center",
-    borderColor: "#fff",
+    borderColor: colors.borderWhite,
     borderWidth: 1,
     width: 200,
     height: 50,
     padding: 15,
     fontWeight: "bold",
-    color: "#fff",
+    color: colors.textWhite,
   },
   header: {
     fontSize: 32,
     fontWeight: "600",
     padding: 10,
-    color: "#FFE81F",
+    color: colors.mainBanana,
     textShadowColor: " rgba(255, 232, 31, 1)",
     textShadowOffset: { width: 3, height: 3 },
     textShadowRadius: 19,

@@ -10,20 +10,24 @@ import {
   Image,
   TouchableHighlight,
 } from "react-native";
-import { Person } from "../model/person";
+import { IPerson } from "../model/person";
 import { DataSW } from "../model/data";
 import { CacheService } from "../service/CacheService";
 import { SwapiService } from "../service/SwapiService";
 import { PeopleService } from "../service/PeopleService";
+import colors from "../config/colors";
 
 interface State {
-  data: Person[];
+  data: IPerson[];
   isLoading: boolean;
   nextURL: string;
   search: string;
 }
 
-export default class People extends Component<{}, State> {
+interface IPeopleProps {
+  navigation: any;
+}
+export default class People extends Component<IPeopleProps, State> {
   private peopleService: PeopleService;
 
   constructor(props) {
@@ -42,7 +46,7 @@ export default class People extends Component<{}, State> {
 
   private async getPeople() {
     try {
-      const response: DataSW<Person> = await this.peopleService.getPeople();
+      const response: DataSW<IPerson> = await this.peopleService.getPeople();
       this.setState({ data: response.results, nextURL: response.next });
     } catch (error) {
       console.log(error);
@@ -53,7 +57,7 @@ export default class People extends Component<{}, State> {
 
   private getMore = async () => {
     try {
-      const response: DataSW<Person> = await this.peopleService.getMore(
+      const response: DataSW<IPerson> = await this.peopleService.getMore(
         this.state.nextURL
       );
       const combinedResults = [...this.state.data, ...response.results];
@@ -63,9 +67,9 @@ export default class People extends Component<{}, State> {
     }
   };
 
-  private getPerson = async () => {
+  private searchPeople = async () => {
     try {
-      const response: DataSW<Person> = await this.peopleService.searchPeople(
+      const response: DataSW<IPerson> = await this.peopleService.searchPeople(
         this.state.search
       );
       this.setState({ data: response.results });
@@ -89,7 +93,7 @@ export default class People extends Component<{}, State> {
             style={styles.inputStyle}
             onChangeText={(search) => this.setState({ search })}
           />
-          <TouchableHighlight onPress={this.getPerson}>
+          <TouchableHighlight onPress={this.searchPeople}>
             <Image
               style={styles.imageStyle}
               source={require("../assets/searchIcon.png")}
@@ -106,12 +110,21 @@ export default class People extends Component<{}, State> {
             data={data}
             keyExtractor={(item) => item.url}
             renderItem={({ item }) => (
-              <View style={styles.itemsList}>
-                <Text style={styles.item}>{item.name}</Text>
-                <Text style={styles.item}>Gender: {item.gender}</Text>
-                <Text style={styles.item}>Birth year: {item.birth_year}</Text>
-                <Text style={styles.item}>Height: {item.height} cm</Text>
-              </View>
+              <TouchableHighlight
+                style={styles.itemsList}
+                onPress={() =>
+                  this.props.navigation.navigate("Details", { details: item })
+                }
+              >
+                <View>
+                  <Text style={[styles.item, styles.itemName]}>
+                    {item.name}
+                  </Text>
+                  <Text style={styles.item}>Gender: {item.gender}</Text>
+                  <Text style={styles.item}>Birth year: {item.birth_year}</Text>
+                  <Text style={styles.item}>Height: {item.height} cm</Text>
+                </View>
+              </TouchableHighlight>
             )}
           />
         )}
@@ -130,13 +143,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     borderBottomWidth: 1,
-    backgroundColor: "gray",
+    backgroundColor: colors.searchWindow,
     width: 200,
     height: 50,
     margin: 6,
     padding: 15,
     fontWeight: "bold",
-    color: "#fff",
   },
   inputStyle: { flex: 1 },
   imageStyle: {
@@ -148,28 +160,34 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: "#000000",
-    color: "#fff",
+    backgroundColor: colors.mainBackground,
     alignItems: "center",
   },
   itemsList: {
     textAlign: "center",
-    borderColor: "#fff",
+    borderColor: colors.borderWhite,
     borderWidth: 1,
     width: "45%",
-    height: 100,
     margin: 6,
     padding: 15,
   },
   item: {
+    textAlign: "center",
     fontWeight: "bold",
-    color: "#fff",
+    color: colors.textBlue,
+  },
+  itemName: {
+    textTransform: "uppercase",
+    fontSize: 14,
+    borderBottomColor: colors.borderWhite,
+    borderBottomWidth: 1,
+    marginBottom: 10,
   },
   button: {
     width: "100%",
     height: 40,
     padding: 10,
-    backgroundColor: "#FFE81F",
+    backgroundColor: colors.mainBanana,
   },
   buttonText: {
     textAlign: "center",
