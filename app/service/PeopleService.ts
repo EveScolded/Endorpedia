@@ -1,15 +1,15 @@
 import { IDataService } from "./IDataService";
-import { IPerson } from "../model/person";
-import { DataSW } from "../model/data";
+import { IPerson } from "../model/IPerson";
+import { IDataSW } from "../model/IDataSW";
 
 export class PeopleService {
   constructor(private dataService: IDataService) {}
 
-  public getPeople(): Promise<DataSW<IPerson>> {
+  public getPeople(): Promise<IDataSW<IPerson[]>> {
     return this.dataService.getData("people");
   }
 
-  public getMore(nextURL: string): Promise<DataSW<IPerson>> {
+  public getMore(nextURL: string): Promise<IDataSW<IPerson[]>> {
     return this.dataService.getData(nextURL);
   }
 

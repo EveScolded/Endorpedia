@@ -10,8 +10,8 @@ import {
   Image,
   TouchableHighlight,
 } from "react-native";
-import { IPerson } from "../model/person";
-import { DataSW } from "../model/data";
+import { IPerson } from "../model/IPerson";
+import { IDataSW } from "../model/IDataSW";
 import { CacheService } from "../service/CacheService";
 import { SwapiService } from "../service/SwapiService";
 import { PeopleService } from "../service/PeopleService";
@@ -46,7 +46,7 @@ export default class People extends Component<IPeopleProps, State> {
 
   private async getPeople() {
     try {
-      const response: DataSW<IPerson> = await this.peopleService.getPeople();
+      const response: IDataSW<IPerson[]> = await this.peopleService.getPeople();
       this.setState({ data: response.results, nextURL: response.next });
     } catch (error) {
       console.log(error);
@@ -57,7 +57,7 @@ export default class People extends Component<IPeopleProps, State> {
 
   private getMore = async () => {
     try {
-      const response: DataSW<IPerson> = await this.peopleService.getMore(
+      const response: IDataSW<IPerson[]> = await this.peopleService.getMore(
         this.state.nextURL
       );
       const combinedResults = [...this.state.data, ...response.results];
@@ -69,9 +69,8 @@ export default class People extends Component<IPeopleProps, State> {
 
   private searchPeople = async () => {
     try {
-      const response: DataSW<IPerson> = await this.peopleService.searchPeople(
-        this.state.search
-      );
+      const response: IDataSW<IPerson[]> =
+        await this.peopleService.searchPeople(this.state.search);
       this.setState({ data: response.results });
     } catch (error) {
       console.log(error);
