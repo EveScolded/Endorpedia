@@ -16,6 +16,7 @@ import { CacheService } from "../service/CacheService";
 import { SwapiService } from "../service/SwapiService";
 import { PeopleService } from "../service/PeopleService";
 import colors from "../config/colors";
+import Card from "../UI/Card";
 
 interface State {
   data: IPerson[];
@@ -77,6 +78,12 @@ export default class People extends Component<IPeopleProps, State> {
     }
   };
 
+  private goToDetails = (clickedItem) => {
+    this.props.navigation.navigate("Details", {
+      details: clickedItem,
+    });
+  };
+
   componentDidMount() {
     this.getPeople();
   }
@@ -109,21 +116,17 @@ export default class People extends Component<IPeopleProps, State> {
             data={data}
             keyExtractor={(item) => item.url}
             renderItem={({ item }) => (
-              <TouchableHighlight
-                style={styles.itemsList}
-                onPress={() =>
-                  this.props.navigation.navigate("Details", { details: item })
-                }
-              >
-                <View>
-                  <Text style={[styles.item, styles.itemName]}>
-                    {item.name}
-                  </Text>
-                  <Text style={styles.item}>Gender: {item.gender}</Text>
-                  <Text style={styles.item}>Birth year: {item.birth_year}</Text>
-                  <Text style={styles.item}>Height: {item.height} cm</Text>
-                </View>
-              </TouchableHighlight>
+              <Card
+                item={item}
+                itemName={item.name}
+                propertyOneName={"Gender"}
+                propertyOneValue={item.gender}
+                propertyTwoName={"Birth year"}
+                propertyTwoValue={item.birth_year}
+                propertyThreeName={"Height"}
+                propertyThreeValue={item.height}
+                onClick={this.goToDetails}
+              ></Card>
             )}
           />
         )}
@@ -161,26 +164,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.mainBackground,
     alignItems: "center",
-  },
-  itemsList: {
-    textAlign: "center",
-    borderColor: colors.borderWhite,
-    borderWidth: 1,
-    width: "45%",
-    margin: 6,
-    padding: 15,
-  },
-  item: {
-    textAlign: "center",
-    fontWeight: "bold",
-    color: colors.textBlue,
-  },
-  itemName: {
-    textTransform: "uppercase",
-    fontSize: 14,
-    borderBottomColor: colors.borderWhite,
-    borderBottomWidth: 1,
-    marginBottom: 10,
   },
   button: {
     width: "100%",

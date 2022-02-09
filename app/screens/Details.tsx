@@ -68,8 +68,18 @@ export default class Details extends Component<IDetailsProps, State> {
           <View style={styles.details}>
             <Text style={styles.detail}>
               {item[0].toUpperCase() + item.slice(1).replace("_", " ")}:{" "}
-              {this.state.newDetails[item]}
             </Text>
+            {Array.isArray(this.state.newDetails[item]) ? (
+              <FlatList
+                data={this.state.newDetails[item]}
+                keyExtractor={(item) => item}
+                renderItem={({ item }) => (
+                  <Text style={styles.detail}>{item}</Text>
+                )}
+              />
+            ) : (
+              <Text style={styles.detail}>{this.state.newDetails[item]}</Text>
+            )}
           </View>
         )}
       />
@@ -79,10 +89,10 @@ export default class Details extends Component<IDetailsProps, State> {
 
 const styles = StyleSheet.create({
   details: {
+    flexDirection: "row",
     flex: 1,
     padding: 10,
     backgroundColor: colors.mainBackground,
-    justifyContent: "space-evenly",
   },
   detail: {
     color: colors.textBlue,
