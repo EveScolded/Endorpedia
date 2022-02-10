@@ -21,7 +21,7 @@ export default class Details extends Component<IDetailsProps, State> {
 
   constructor(props) {
     super(props);
-    this.dataService = new SwapiService();
+    this.dataService = new CacheService(new SwapiService());
 
     this.state = {
       newDetails: {},
@@ -61,40 +61,58 @@ export default class Details extends Component<IDetailsProps, State> {
 
   render() {
     return (
-      <FlatList
-        data={Object.keys(this.state.newDetails)}
-        keyExtractor={(item) => item}
-        renderItem={({ item }) => (
-          <View style={styles.details}>
-            <Text style={styles.detail}>
-              {item[0].toUpperCase() + item.slice(1).replace("_", " ")}:{" "}
-            </Text>
-            {Array.isArray(this.state.newDetails[item]) ? (
-              <FlatList
-                data={this.state.newDetails[item]}
-                keyExtractor={(item) => item}
-                renderItem={({ item }) => (
-                  <Text style={styles.detail}>{item}</Text>
-                )}
-              />
-            ) : (
-              <Text style={styles.detail}>{this.state.newDetails[item]}</Text>
-            )}
-          </View>
-        )}
-      />
+      <View style={styles.detailsContainer}>
+        <FlatList
+          data={Object.keys(this.state.newDetails)}
+          keyExtractor={(item) => item}
+          renderItem={({ item }) => (
+            <View style={styles.details}>
+              <Text style={styles.detailName}>
+                {item[0].toUpperCase() + item.slice(1).replace("_", " ")}:{" "}
+              </Text>
+              {Array.isArray(this.state.newDetails[item]) ? (
+                this.state.newDetails[item].length > 0 ? (
+                  <FlatList
+                    data={this.state.newDetails[item]}
+                    keyExtractor={(_arrayItem, index) => index.toString()}
+                    renderItem={({ item }) => (
+                      <Text style={styles.detailValue}>{item}</Text>
+                    )}
+                  />
+                ) : (
+                  <Text style={styles.detailValue}>{"n/a"}</Text>
+                )
+              ) : (
+                <Text style={styles.detailValue}>
+                  {this.state.newDetails[item]}
+                </Text>
+              )}
+            </View>
+          )}
+        />
+      </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
-  details: {
-    flexDirection: "row",
-    flex: 1,
-    padding: 10,
+  detailsContainer: {
     backgroundColor: colors.mainBackground,
   },
-  detail: {
+  details: {
+    // flexDirection: "row",
+    flex: 1,
+    padding: 10,
+    paddingLeft: 25,
+    borderBottomColor: "rgba(161, 161, 161, 0.4)",
+    borderBottomWidth: 1,
+  },
+  detailName: {
+    color: colors.textBlue,
+    fontWeight: "bold",
+    lineHeight: 20,
+  },
+  detailValue: {
     color: colors.textBlue,
     lineHeight: 20,
   },
