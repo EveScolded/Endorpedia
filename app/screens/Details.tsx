@@ -1,15 +1,14 @@
+import { RouteProp } from "@react-navigation/native";
 import React, { Component } from "react";
 import { Text, View, StyleSheet, FlatList } from "react-native";
 import colors from "../config/colors";
-import { IDataSW } from "../model/IDataSW";
 import { IDetails } from "../model/IDetails";
-import { IFilm } from "../model/IFilm";
 import { CacheService } from "../service/CacheService";
 import { IDataService } from "../service/IDataService";
 import { SwapiService } from "../service/SwapiService";
 
 interface IDetailsProps {
-  route: any;
+  route: RouteProp<any>;
 }
 
 interface State {

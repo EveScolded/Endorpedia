@@ -3,15 +3,11 @@ import { Text, View, StyleSheet, TouchableHighlight } from "react-native";
 import colors from "../config/colors";
 
 interface CardProps {
-  item: string[];
   itemName: string;
-  propertyOneName: string;
-  propertyOneValue: string;
-  propertyTwoName: string;
-  propertyTwoValue: string;
-  propertyThreeName: string;
-  propertyThreeValue: string;
-  onClick: (string) => void;
+  propertyOne: string[];
+  propertyTwo: string[];
+  propertyThree: string[];
+  onClick: () => void;
 }
 
 export default class Card extends Component<CardProps, {}> {
@@ -22,20 +18,20 @@ export default class Card extends Component<CardProps, {}> {
     return (
       <TouchableHighlight
         style={styles.itemsList}
-        onPress={() => this.props.onClick(this.props.item)}
+        onPress={() => this.props.onClick()}
       >
         <View>
           <Text style={[styles.item, styles.itemName]}>
             {this.props.itemName}
           </Text>
           <Text style={styles.item}>
-            {this.props.propertyOneName}: {this.props.propertyOneValue}
+            {this.props.propertyOne[0]}: {this.props.propertyOne[1]}
           </Text>
           <Text style={styles.item}>
-            {this.props.propertyTwoName}: {this.props.propertyTwoValue}
+            {this.props.propertyTwo[0]}: {this.props.propertyTwo[1]}
           </Text>
           <Text style={styles.item}>
-            {this.props.propertyThreeName}: {this.props.propertyThreeValue} cm
+            {this.props.propertyThree[0]}: {this.props.propertyThree[1]}
           </Text>
         </View>
       </TouchableHighlight>
@@ -48,7 +44,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     borderColor: colors.borderWhite,
     borderWidth: 1,
-    width: 166,
+    width: 170,
     margin: 6,
     padding: 15,
   },

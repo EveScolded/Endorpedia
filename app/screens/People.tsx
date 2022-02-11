@@ -12,11 +12,11 @@ import {
 } from "react-native";
 import { IPerson } from "../model/IPerson";
 import { IDataSW } from "../model/IDataSW";
-import { CacheService } from "../service/CacheService";
-import { SwapiService } from "../service/SwapiService";
 import { PeopleService } from "../service/PeopleService";
 import colors from "../config/colors";
 import Card from "../UI/Card";
+import { NavigationProp } from "@react-navigation/native";
+import SearchInput from "../UI/SearchInput";
 
 interface State {
   data: IPerson[];
@@ -26,16 +26,14 @@ interface State {
 }
 
 interface IPeopleProps {
-  navigation: any;
+  navigation: NavigationProp<any>;
 }
 export default class People extends Component<IPeopleProps, State> {
   private peopleService: PeopleService;
 
   constructor(props) {
     super(props);
-    this.peopleService = new PeopleService(
-      new CacheService(new SwapiService())
-    );
+    this.peopleService = new PeopleService(props.route.params.dataService);
 
     this.state = {
       data: [],
@@ -84,6 +82,10 @@ export default class People extends Component<IPeopleProps, State> {
     });
   };
 
+  private onSearchPerson = (search) => {
+    this.setState({ search });
+  };
+
   componentDidMount() {
     this.getPeople();
   }
@@ -93,19 +95,11 @@ export default class People extends Component<IPeopleProps, State> {
 
     return (
       <View style={styles.container}>
-        <View style={styles.inputContainer}>
-          <TextInput
-            placeholder="name"
-            style={styles.inputStyle}
-            onChangeText={(search) => this.setState({ search })}
-          />
-          <TouchableHighlight onPress={this.searchPeople}>
-            <Image
-              style={styles.imageStyle}
-              source={require("../assets/searchIcon.png")}
-            />
-          </TouchableHighlight>
-        </View>
+        <SearchInput
+          placeholderText={"name"}
+          onSearchInput={(search) => this.onSearchPerson(search)}
+          searchPeople={this.searchPeople}
+        />
 
         {isLoading ? (
           <ActivityIndicator />
@@ -117,15 +111,11 @@ export default class People extends Component<IPeopleProps, State> {
             keyExtractor={(item) => item.url}
             renderItem={({ item }) => (
               <Card
-                item={item}
                 itemName={item.name}
-                propertyOneName={"Gender"}
-                propertyOneValue={item.gender}
-                propertyTwoName={"Birth year"}
-                propertyTwoValue={item.birth_year}
-                propertyThreeName={"Height"}
-                propertyThreeValue={item.height}
-                onClick={this.goToDetails}
+                propertyOne={["Gender", item.gender]}
+                propertyTwo={["Birth year", item.birth_year]}
+                propertyThree={["Height", item.height + " cm"]}
+                onClick={() => this.goToDetails(item)}
               ></Card>
             )}
           />
@@ -141,25 +131,6 @@ export default class People extends Component<IPeopleProps, State> {
 }
 
 const styles = StyleSheet.create({
-  inputContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    borderBottomWidth: 1,
-    backgroundColor: colors.searchWindow,
-    width: 200,
-    height: 50,
-    margin: 6,
-    padding: 15,
-    fontWeight: "bold",
-  },
-  inputStyle: { flex: 1 },
-  imageStyle: {
-    margin: 3,
-    height: 15,
-    width: 15,
-    resizeMode: "stretch",
-    alignItems: "center",
-  },
   container: {
     flex: 1,
     backgroundColor: colors.mainBackground,
