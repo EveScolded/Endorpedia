@@ -1,12 +1,5 @@
 import React, { Component } from "react";
-import {
-  ActivityIndicator,
-  FlatList,
-  Text,
-  View,
-  StyleSheet,
-  TouchableOpacity,
-} from "react-native";
+import { ActivityIndicator, FlatList, View, StyleSheet } from "react-native";
 import { IPerson } from "../model/IPerson";
 import { IDataSW } from "../model/IDataSW";
 import { PeopleService } from "../service/PeopleService";

@@ -6,6 +6,7 @@ import People from "./app/screens/People";
 import Details from "./app/screens/Details";
 import { SwapiService } from "./app/service/SwapiService";
 import { CacheService } from "./app/service/CacheService";
+import Autenthication from "./app/screens/Authentication";
 
 const Stack = createNativeStackNavigator();
 
@@ -15,6 +16,16 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator>
+        <Stack.Screen
+          name="Auth"
+          component={Autenthication}
+          options={{
+            title: "",
+            headerStyle: {
+              backgroundColor: "black",
+            },
+          }}
+        />
         <Stack.Screen
           name="Start"
           component={StartScreen}
