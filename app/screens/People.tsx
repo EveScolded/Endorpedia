@@ -158,14 +158,4 @@ const styles = StyleSheet.create({
     backgroundColor: colors.mainBackground,
     alignItems: "center",
   },
-  button: {
-    width: "100%",
-    height: 40,
-    padding: 10,
-    backgroundColor: colors.mainBanana,
-  },
-  buttonText: {
-    textAlign: "center",
-    fontWeight: "bold",
-  },
 });

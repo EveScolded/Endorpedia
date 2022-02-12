@@ -42,7 +42,10 @@ export default class Details extends Component<IDetailsProps, State> {
 
     await Promise.all(
       Object.keys(details).map(async (key) => {
-        if (details[key].includes("https") && !Array.isArray(details[key])) {
+        if (
+          details[key].toString().includes("https") &&
+          !Array.isArray(details[key])
+        ) {
           newDetails[key] = await this.getDetail(details[key]);
         }
         if (Array.isArray(details[key])) {

@@ -4,9 +4,9 @@ import colors from "../config/colors";
 
 interface CardProps {
   itemName: string;
-  propertyOne: string[];
-  propertyTwo: string[];
-  propertyThree: string[];
+  propertyOne: string[] | string;
+  propertyTwo: string[] | string;
+  propertyThree: string[] | string;
   onClick: () => void;
 }
 

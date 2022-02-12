@@ -6,8 +6,6 @@ import {
   Image,
   TouchableOpacity as TouchableHighlight,
 } from "react-native";
-import { NavigationContainer } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import colors from "../config/colors";
 
 export default function StartScreen({ navigation }) {
@@ -24,7 +22,14 @@ export default function StartScreen({ navigation }) {
             People
           </Text>
         </TouchableHighlight>
-        <Text style={styles.text}>Films</Text>
+        <TouchableHighlight>
+          <Text
+            style={styles.text}
+            onPress={() => navigation.navigate("Films")}
+          >
+            Films
+          </Text>
+        </TouchableHighlight>
         <Text style={styles.text}>Starships</Text>
         <Text style={styles.text}>Vehicles</Text>
         <Text style={styles.text}>Species</Text>

@@ -7,6 +7,8 @@ import Details from "./app/screens/Details";
 import { SwapiService } from "./app/service/SwapiService";
 import { CacheService } from "./app/service/CacheService";
 import Autenthication from "./app/screens/Authentication";
+import colors from "./app/config/colors";
+import Films from "./app/screens/Films";
 
 const Stack = createNativeStackNavigator();
 
@@ -22,7 +24,7 @@ export default function App() {
           options={{
             title: "",
             headerStyle: {
-              backgroundColor: "black",
+              backgroundColor: colors.mainBackground,
             },
           }}
         />
@@ -32,17 +34,18 @@ export default function App() {
           options={{
             title: "",
             headerStyle: {
-              backgroundColor: "black",
-            },
-            headerTintColor: "#fff",
-            headerTitleStyle: {
-              fontWeight: "bold",
+              backgroundColor: colors.mainBackground,
             },
           }}
         />
         <Stack.Screen
           name="People"
           component={People}
+          initialParams={{ dataService: swapiService }}
+        />
+        <Stack.Screen
+          name="Films"
+          component={Films}
           initialParams={{ dataService: swapiService }}
         />
         <Stack.Screen
