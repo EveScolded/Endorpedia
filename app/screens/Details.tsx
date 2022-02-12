@@ -99,7 +99,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.mainBackground,
   },
   details: {
-    // flexDirection: "row",
     flex: 1,
     padding: 10,
     paddingLeft: 25,

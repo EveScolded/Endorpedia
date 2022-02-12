@@ -6,9 +6,6 @@ import {
   View,
   StyleSheet,
   TouchableOpacity,
-  TextInput,
-  Image,
-  TouchableHighlight,
 } from "react-native";
 import { IPerson } from "../model/IPerson";
 import { IDataSW } from "../model/IDataSW";
@@ -17,12 +14,14 @@ import colors from "../config/colors";
 import Card from "../UI/Card";
 import { NavigationProp } from "@react-navigation/native";
 import SearchInput from "../UI/SearchInput";
+import Dropdown from "../UI/Dropdown";
 
 interface State {
   data: IPerson[];
+  originalData: IPerson[];
   isLoading: boolean;
-  nextURL: string;
   search: string;
+  pickerSelectedValue: string;
 }
 
 interface IPeopleProps {
@@ -37,16 +36,23 @@ export default class People extends Component<IPeopleProps, State> {
 
     this.state = {
       data: [],
+      originalData: [],
       isLoading: true,
-      nextURL: "",
       search: "",
+      pickerSelectedValue: "all",
     };
   }
 
   private async getPeople() {
     try {
       const response: IDataSW<IPerson[]> = await this.peopleService.getPeople();
-      this.setState({ data: response.results, nextURL: response.next });
+      this.setState(
+        {
+          originalData: response.results,
+        },
+        () => this.getNextPage(response)
+      );
+      this.filterPeople(this.state.pickerSelectedValue);
     } catch (error) {
       console.log(error);
     } finally {
@@ -54,15 +60,20 @@ export default class People extends Component<IPeopleProps, State> {
     }
   }
 
-  private getMore = async () => {
-    try {
-      const response: IDataSW<IPerson[]> = await this.peopleService.getMore(
-        this.state.nextURL
-      );
-      const combinedResults = [...this.state.data, ...response.results];
-      this.setState({ data: combinedResults, nextURL: response.next });
-    } catch (error) {
-      console.log(error);
+  private getNextPage = async (previousResponse: IDataSW<IPerson[]>) => {
+    if (previousResponse.next) {
+      try {
+        const response: IDataSW<IPerson[]> = await this.peopleService.getMore(
+          previousResponse.next
+        );
+        const combinedResults = [...this.state.data, ...response.results];
+        this.setState({ originalData: combinedResults }, () =>
+          this.getNextPage(response)
+        );
+        this.filterPeople(this.state.pickerSelectedValue);
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
 
@@ -86,12 +97,28 @@ export default class People extends Component<IPeopleProps, State> {
     this.setState({ search });
   };
 
+  private onSetPickerSelectedValue = (pickerSelectedValue) => {
+    this.setState({ pickerSelectedValue });
+    this.filterPeople(pickerSelectedValue);
+  };
+
+  private filterPeople = (selectedOption) => {
+    if (selectedOption !== "all") {
+      let filteredData = this.state.originalData.filter(
+        (person) => person.gender === selectedOption
+      );
+      this.setState({ data: filteredData });
+    } else {
+      this.setState({ data: this.state.originalData });
+    }
+  };
+
   componentDidMount() {
     this.getPeople();
   }
 
   render() {
-    const { data, isLoading, nextURL } = this.state;
+    const { data, isLoading } = this.state;
 
     return (
       <View style={styles.container}>
@@ -100,7 +127,13 @@ export default class People extends Component<IPeopleProps, State> {
           onSearchInput={(search) => this.onSearchPerson(search)}
           searchPeople={this.searchPeople}
         />
-
+        <Dropdown
+          pickerData={["all", "male", "female", "n/a"]}
+          pickerSelectedValue={this.state.pickerSelectedValue}
+          onSetPickerSelectedValue={(pickerSelectedValue) =>
+            this.onSetPickerSelectedValue(pickerSelectedValue)
+          }
+        />
         {isLoading ? (
           <ActivityIndicator />
         ) : (
@@ -109,6 +142,7 @@ export default class People extends Component<IPeopleProps, State> {
             numColumns={2}
             data={data}
             keyExtractor={(item) => item.url}
+            extraData={data}
             renderItem={({ item }) => (
               <Card
                 itemName={item.name}
@@ -120,11 +154,6 @@ export default class People extends Component<IPeopleProps, State> {
             )}
           />
         )}
-        {nextURL ? (
-          <TouchableOpacity style={styles.button} onPress={this.getMore}>
-            <Text style={styles.buttonText}>More</Text>
-          </TouchableOpacity>
-        ) : null}
       </View>
     );
   }
