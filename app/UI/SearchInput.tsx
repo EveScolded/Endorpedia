@@ -11,7 +11,7 @@ import colors from "../config/colors";
 interface InputProps {
   placeholderText: string;
   onSearchInput: (search: string) => void;
-  searchPeople: () => void;
+  searchItem: () => void;
 }
 
 export default class SearchInput extends Component<InputProps, {}> {
@@ -27,7 +27,7 @@ export default class SearchInput extends Component<InputProps, {}> {
           style={styles.inputStyle}
           onChangeText={(search) => this.props.onSearchInput(search)}
         />
-        <TouchableHighlight onPress={this.props.searchPeople}>
+        <TouchableHighlight onPress={this.props.searchItem}>
           <Image
             style={styles.imageStyle}
             source={require("../assets/searchIcon.png")}

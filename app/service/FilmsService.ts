@@ -12,8 +12,4 @@ export class FilmsService {
   public getMore(nextURL: string): Promise<IDataSW<IFilm[]>> {
     return this.dataService.getData(nextURL);
   }
-
-  public searchFilm(query: string) {
-    return this.dataService.getData("films/?search=" + query);
-  }
 }

@@ -10,8 +10,6 @@ import { NavigationProp } from "@react-navigation/native";
 interface State {
   originalData: IFilm[];
   isLoading: boolean;
-  search: string;
-  pickerSelectedValue: string;
 }
 
 interface IFilmsProps {
@@ -27,8 +25,6 @@ export default class Films extends Component<IFilmsProps, State> {
     this.state = {
       originalData: [],
       isLoading: true,
-      search: "",
-      pickerSelectedValue: "all",
     };
   }
 
@@ -96,8 +92,8 @@ export default class Films extends Component<IFilmsProps, State> {
                 itemName={item.title}
                 propertyOne={[
                   "Episode",
-                  this.romans[item.episode_id],
-                ].toString()}
+                  this.romans[item.episode_id].toLocaleString(),
+                ]}
                 propertyTwo={["Director", item.director]}
                 propertyThree={["Release date", item.release_date]}
                 onClick={() => this.goToDetails(item)}

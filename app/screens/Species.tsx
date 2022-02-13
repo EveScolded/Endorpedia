@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import { ActivityIndicator, FlatList, View, StyleSheet } from "react-native";
-import { IPerson } from "../model/IPerson";
+import { ISpecies } from "../model/ISpecies";
 import { IDataSW } from "../model/IDataSW";
-import { PeopleService } from "../service/PeopleService";
+import { SpeciesService } from "../service/SpeciesService";
 import colors from "../config/colors";
 import Card from "../UI/Card";
 import { NavigationProp } from "@react-navigation/native";
@@ -10,23 +10,23 @@ import SearchInput from "../UI/SearchInput";
 import Dropdown from "../UI/Dropdown";
 
 interface State {
-  data: IPerson[];
-  originalData: IPerson[];
+  data: ISpecies[];
+  originalData: ISpecies[];
   isLoading: boolean;
   search: string;
   pickerSelectedValue: string;
   pickerData: string[];
 }
 
-interface IPeopleProps {
+interface ISpeciesProps {
   navigation: NavigationProp<any>;
 }
-export default class People extends Component<IPeopleProps, State> {
-  private peopleService: PeopleService;
+export default class Species extends Component<ISpeciesProps, State> {
+  private speciesService: SpeciesService;
 
   constructor(props) {
     super(props);
-    this.peopleService = new PeopleService(props.route.params.dataService);
+    this.speciesService = new SpeciesService(props.route.params.dataService);
 
     this.state = {
       data: [],
@@ -38,16 +38,17 @@ export default class People extends Component<IPeopleProps, State> {
     };
   }
 
-  private async getPeople() {
+  private async getSpecies() {
     try {
-      const response: IDataSW<IPerson[]> = await this.peopleService.getPeople();
+      const response: IDataSW<ISpecies[]> =
+        await this.speciesService.getSpecies();
       this.setState(
         {
           originalData: response.results,
         },
         () => this.getNextPage(response)
       );
-      this.filterPeople(this.state.pickerSelectedValue);
+      this.filterSpecies(this.state.pickerSelectedValue);
     } catch (error) {
       console.log(error);
     } finally {
@@ -55,10 +56,10 @@ export default class People extends Component<IPeopleProps, State> {
     }
   }
 
-  private getNextPage = async (previousResponse: IDataSW<IPerson[]>) => {
+  private getNextPage = async (previousResponse: IDataSW<ISpecies[]>) => {
     if (previousResponse.next) {
       try {
-        const response: IDataSW<IPerson[]> = await this.peopleService.getMore(
+        const response: IDataSW<ISpecies[]> = await this.speciesService.getMore(
           previousResponse.next
         );
         const combinedResults = [...this.state.data, ...response.results];
@@ -66,22 +67,22 @@ export default class People extends Component<IPeopleProps, State> {
           {
             originalData: combinedResults,
             pickerData: [
-              ...new Set(combinedResults.map((item) => item.gender)),
+              ...new Set(combinedResults.map((item) => item.classification)),
             ],
           },
           () => this.getNextPage(response)
         );
-        this.filterPeople(this.state.pickerSelectedValue);
+        this.filterSpecies(this.state.pickerSelectedValue);
       } catch (error) {
         console.log(error);
       }
     }
   };
 
-  private searchPeople = async () => {
+  private searchSpecies = async () => {
     try {
-      const response: IDataSW<IPerson[]> =
-        await this.peopleService.searchPeople(this.state.search);
+      const response: IDataSW<ISpecies[]> =
+        await this.speciesService.searchSpecies(this.state.search);
       this.setState({ data: response.results });
     } catch (error) {
       console.log(error);
@@ -100,13 +101,13 @@ export default class People extends Component<IPeopleProps, State> {
 
   private onSetPickerSelectedValue = (pickerSelectedValue) => {
     this.setState({ pickerSelectedValue });
-    this.filterPeople(pickerSelectedValue);
+    this.filterSpecies(pickerSelectedValue);
   };
 
-  private filterPeople = (selectedOption) => {
+  private filterSpecies = (selectedOption) => {
     if (selectedOption !== "all") {
       let filteredData = this.state.originalData.filter(
-        (person) => person.gender === selectedOption
+        (person) => person.classification === selectedOption
       );
       this.setState({ data: filteredData });
     } else {
@@ -115,7 +116,7 @@ export default class People extends Component<IPeopleProps, State> {
   };
 
   componentDidMount() {
-    this.getPeople();
+    this.getSpecies();
   }
 
   render() {
@@ -126,7 +127,7 @@ export default class People extends Component<IPeopleProps, State> {
         <SearchInput
           placeholderText={"name"}
           onSearchInput={(search) => this.onSearchPerson(search)}
-          searchItem={this.searchPeople}
+          searchItem={this.searchSpecies}
         />
         <Dropdown
           pickerData={["all", ...this.state.pickerData]}
@@ -147,9 +148,9 @@ export default class People extends Component<IPeopleProps, State> {
             renderItem={({ item }) => (
               <Card
                 itemName={item.name}
-                propertyOne={["Gender", item.gender]}
-                propertyTwo={["Birth year", item.birth_year]}
-                propertyThree={["Height", item.height + " cm"]}
+                propertyOne={["Classification", item.classification]}
+                propertyTwo={["Average height", item.average_height]}
+                propertyThree={["Average lifespan", item.average_lifespan]}
                 onClick={() => this.goToDetails(item)}
               ></Card>
             )}

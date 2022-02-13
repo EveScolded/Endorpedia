@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import { ActivityIndicator, FlatList, View, StyleSheet } from "react-native";
-import { IPerson } from "../model/IPerson";
+import { IPlanet } from "../model/IPlanet";
 import { IDataSW } from "../model/IDataSW";
-import { PeopleService } from "../service/PeopleService";
+import { PlanetsService } from "../service/PlanetsService";
 import colors from "../config/colors";
 import Card from "../UI/Card";
 import { NavigationProp } from "@react-navigation/native";
@@ -10,23 +10,23 @@ import SearchInput from "../UI/SearchInput";
 import Dropdown from "../UI/Dropdown";
 
 interface State {
-  data: IPerson[];
-  originalData: IPerson[];
+  data: IPlanet[];
+  originalData: IPlanet[];
   isLoading: boolean;
   search: string;
   pickerSelectedValue: string;
   pickerData: string[];
 }
 
-interface IPeopleProps {
+interface IPlanetsProps {
   navigation: NavigationProp<any>;
 }
-export default class People extends Component<IPeopleProps, State> {
-  private peopleService: PeopleService;
+export default class People extends Component<IPlanetsProps, State> {
+  private planetsService: PlanetsService;
 
   constructor(props) {
     super(props);
-    this.peopleService = new PeopleService(props.route.params.dataService);
+    this.planetsService = new PlanetsService(props.route.params.dataService);
 
     this.state = {
       data: [],
@@ -38,16 +38,17 @@ export default class People extends Component<IPeopleProps, State> {
     };
   }
 
-  private async getPeople() {
+  private async getPlanets() {
     try {
-      const response: IDataSW<IPerson[]> = await this.peopleService.getPeople();
+      const response: IDataSW<IPlanet[]> =
+        await this.planetsService.getPlanets();
       this.setState(
         {
           originalData: response.results,
         },
         () => this.getNextPage(response)
       );
-      this.filterPeople(this.state.pickerSelectedValue);
+      this.filterPlanets(this.state.pickerSelectedValue);
     } catch (error) {
       console.log(error);
     } finally {
@@ -55,10 +56,10 @@ export default class People extends Component<IPeopleProps, State> {
     }
   }
 
-  private getNextPage = async (previousResponse: IDataSW<IPerson[]>) => {
+  private getNextPage = async (previousResponse: IDataSW<IPlanet[]>) => {
     if (previousResponse.next) {
       try {
-        const response: IDataSW<IPerson[]> = await this.peopleService.getMore(
+        const response: IDataSW<IPlanet[]> = await this.planetsService.getMore(
           previousResponse.next
         );
         const combinedResults = [...this.state.data, ...response.results];
@@ -66,22 +67,22 @@ export default class People extends Component<IPeopleProps, State> {
           {
             originalData: combinedResults,
             pickerData: [
-              ...new Set(combinedResults.map((item) => item.gender)),
+              ...new Set(combinedResults.map((item) => item.climate)),
             ],
           },
           () => this.getNextPage(response)
         );
-        this.filterPeople(this.state.pickerSelectedValue);
+        this.filterPlanets(this.state.pickerSelectedValue);
       } catch (error) {
         console.log(error);
       }
     }
   };
 
-  private searchPeople = async () => {
+  private searchPlanet = async () => {
     try {
-      const response: IDataSW<IPerson[]> =
-        await this.peopleService.searchPeople(this.state.search);
+      const response: IDataSW<IPlanet[]> =
+        await this.planetsService.searchPlanet(this.state.search);
       this.setState({ data: response.results });
     } catch (error) {
       console.log(error);
@@ -94,19 +95,19 @@ export default class People extends Component<IPeopleProps, State> {
     });
   };
 
-  private onSearchPerson = (search) => {
+  private onSearchPlanet = (search) => {
     this.setState({ search });
   };
 
   private onSetPickerSelectedValue = (pickerSelectedValue) => {
     this.setState({ pickerSelectedValue });
-    this.filterPeople(pickerSelectedValue);
+    this.filterPlanets(pickerSelectedValue);
   };
 
-  private filterPeople = (selectedOption) => {
+  private filterPlanets = (selectedOption) => {
     if (selectedOption !== "all") {
       let filteredData = this.state.originalData.filter(
-        (person) => person.gender === selectedOption
+        (person) => person.climate === selectedOption
       );
       this.setState({ data: filteredData });
     } else {
@@ -115,7 +116,7 @@ export default class People extends Component<IPeopleProps, State> {
   };
 
   componentDidMount() {
-    this.getPeople();
+    this.getPlanets();
   }
 
   render() {
@@ -125,8 +126,8 @@ export default class People extends Component<IPeopleProps, State> {
       <View style={styles.container}>
         <SearchInput
           placeholderText={"name"}
-          onSearchInput={(search) => this.onSearchPerson(search)}
-          searchItem={this.searchPeople}
+          onSearchInput={(search) => this.onSearchPlanet(search)}
+          searchItem={this.searchPlanet}
         />
         <Dropdown
           pickerData={["all", ...this.state.pickerData]}
@@ -141,15 +142,15 @@ export default class People extends Component<IPeopleProps, State> {
           <FlatList
             columnWrapperStyle={{ justifyContent: "space-between" }}
             numColumns={2}
-            data={data}
+            data={data.sort((a, b) => Number(b.diameter) - Number(a.diameter))}
             keyExtractor={(item) => item.url}
             extraData={data}
             renderItem={({ item }) => (
               <Card
                 itemName={item.name}
-                propertyOne={["Gender", item.gender]}
-                propertyTwo={["Birth year", item.birth_year]}
-                propertyThree={["Height", item.height + " cm"]}
+                propertyOne={["Diameter", item.diameter]}
+                propertyTwo={["Rotation period", item.rotation_period]}
+                propertyThree={["Orbital period", item.orbital_period]}
                 onClick={() => this.goToDetails(item)}
               ></Card>
             )}

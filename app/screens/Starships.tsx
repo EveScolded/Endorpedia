@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import { ActivityIndicator, FlatList, View, StyleSheet } from "react-native";
-import { IPerson } from "../model/IPerson";
+import { IStarship } from "../model/IStarship";
 import { IDataSW } from "../model/IDataSW";
-import { PeopleService } from "../service/PeopleService";
+import { StarshipsService } from "../service/StarshipsService";
 import colors from "../config/colors";
 import Card from "../UI/Card";
 import { NavigationProp } from "@react-navigation/native";
@@ -10,23 +10,25 @@ import SearchInput from "../UI/SearchInput";
 import Dropdown from "../UI/Dropdown";
 
 interface State {
-  data: IPerson[];
-  originalData: IPerson[];
+  data: IStarship[];
+  originalData: IStarship[];
   isLoading: boolean;
   search: string;
   pickerSelectedValue: string;
   pickerData: string[];
 }
 
-interface IPeopleProps {
+interface IStarshipProps {
   navigation: NavigationProp<any>;
 }
-export default class People extends Component<IPeopleProps, State> {
-  private peopleService: PeopleService;
+export default class People extends Component<IStarshipProps, State> {
+  private starshipsService: StarshipsService;
 
   constructor(props) {
     super(props);
-    this.peopleService = new PeopleService(props.route.params.dataService);
+    this.starshipsService = new StarshipsService(
+      props.route.params.dataService
+    );
 
     this.state = {
       data: [],
@@ -38,16 +40,17 @@ export default class People extends Component<IPeopleProps, State> {
     };
   }
 
-  private async getPeople() {
+  private async getStarship() {
     try {
-      const response: IDataSW<IPerson[]> = await this.peopleService.getPeople();
+      const response: IDataSW<IStarship[]> =
+        await this.starshipsService.getStarship();
       this.setState(
         {
           originalData: response.results,
         },
         () => this.getNextPage(response)
       );
-      this.filterPeople(this.state.pickerSelectedValue);
+      this.filterStarship(this.state.pickerSelectedValue);
     } catch (error) {
       console.log(error);
     } finally {
@@ -55,33 +58,34 @@ export default class People extends Component<IPeopleProps, State> {
     }
   }
 
-  private getNextPage = async (previousResponse: IDataSW<IPerson[]>) => {
+  private getNextPage = async (previousResponse: IDataSW<IStarship[]>) => {
     if (previousResponse.next) {
       try {
-        const response: IDataSW<IPerson[]> = await this.peopleService.getMore(
-          previousResponse.next
-        );
+        const response: IDataSW<IStarship[]> =
+          await this.starshipsService.getMore(previousResponse.next);
         const combinedResults = [...this.state.data, ...response.results];
         this.setState(
           {
             originalData: combinedResults,
             pickerData: [
-              ...new Set(combinedResults.map((item) => item.gender)),
+              ...new Set(
+                combinedResults.map((item) => item.starship_class.toLowerCase())
+              ),
             ],
           },
           () => this.getNextPage(response)
         );
-        this.filterPeople(this.state.pickerSelectedValue);
+        this.filterStarship(this.state.pickerSelectedValue);
       } catch (error) {
         console.log(error);
       }
     }
   };
 
-  private searchPeople = async () => {
+  private searchStarship = async () => {
     try {
-      const response: IDataSW<IPerson[]> =
-        await this.peopleService.searchPeople(this.state.search);
+      const response: IDataSW<IStarship[]> =
+        await this.starshipsService.searchStarship(this.state.search);
       this.setState({ data: response.results });
     } catch (error) {
       console.log(error);
@@ -94,19 +98,19 @@ export default class People extends Component<IPeopleProps, State> {
     });
   };
 
-  private onSearchPerson = (search) => {
+  private onSearchStarship = (search) => {
     this.setState({ search });
   };
 
   private onSetPickerSelectedValue = (pickerSelectedValue) => {
     this.setState({ pickerSelectedValue });
-    this.filterPeople(pickerSelectedValue);
+    this.filterStarship(pickerSelectedValue);
   };
 
-  private filterPeople = (selectedOption) => {
+  private filterStarship = (selectedOption) => {
     if (selectedOption !== "all") {
       let filteredData = this.state.originalData.filter(
-        (person) => person.gender === selectedOption
+        (person) => person.starship_class === selectedOption
       );
       this.setState({ data: filteredData });
     } else {
@@ -115,7 +119,7 @@ export default class People extends Component<IPeopleProps, State> {
   };
 
   componentDidMount() {
-    this.getPeople();
+    this.getStarship();
   }
 
   render() {
@@ -125,8 +129,8 @@ export default class People extends Component<IPeopleProps, State> {
       <View style={styles.container}>
         <SearchInput
           placeholderText={"name"}
-          onSearchInput={(search) => this.onSearchPerson(search)}
-          searchItem={this.searchPeople}
+          onSearchInput={(search) => this.onSearchStarship(search)}
+          searchItem={this.searchStarship}
         />
         <Dropdown
           pickerData={["all", ...this.state.pickerData]}
@@ -141,15 +145,17 @@ export default class People extends Component<IPeopleProps, State> {
           <FlatList
             columnWrapperStyle={{ justifyContent: "space-between" }}
             numColumns={2}
-            data={data}
+            data={data.sort(
+              (a, b) => Number(b.cost_in_credits) - Number(a.cost_in_credits)
+            )}
             keyExtractor={(item) => item.url}
             extraData={data}
             renderItem={({ item }) => (
               <Card
                 itemName={item.name}
-                propertyOne={["Gender", item.gender]}
-                propertyTwo={["Birth year", item.birth_year]}
-                propertyThree={["Height", item.height + " cm"]}
+                propertyOne={["Cost in credits", item.cost_in_credits]}
+                propertyTwo={["Length", item.length]}
+                propertyThree={["Crew", item.crew]}
                 onClick={() => this.goToDetails(item)}
               ></Card>
             )}

@@ -30,10 +30,38 @@ export default function StartScreen({ navigation }) {
             Films
           </Text>
         </TouchableHighlight>
-        <Text style={styles.text}>Starships</Text>
-        <Text style={styles.text}>Vehicles</Text>
-        <Text style={styles.text}>Species</Text>
-        <Text style={styles.text}>Planets</Text>
+        <TouchableHighlight>
+          <Text
+            style={styles.text}
+            onPress={() => navigation.navigate("Starships")}
+          >
+            Starships
+          </Text>
+        </TouchableHighlight>
+        <TouchableHighlight>
+          <Text
+            style={styles.text}
+            onPress={() => navigation.navigate("Vehicles")}
+          >
+            Vehicles
+          </Text>
+        </TouchableHighlight>
+        <TouchableHighlight>
+          <Text
+            style={styles.text}
+            onPress={() => navigation.navigate("Species")}
+          >
+            Species
+          </Text>
+        </TouchableHighlight>
+        <TouchableHighlight>
+          <Text
+            style={styles.text}
+            onPress={() => navigation.navigate("Planets")}
+          >
+            Planets
+          </Text>
+        </TouchableHighlight>
       </View>
     </View>
   );

@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import { ActivityIndicator, FlatList, View, StyleSheet } from "react-native";
-import { IPerson } from "../model/IPerson";
+import { IVehicle } from "../model/IVehicle";
 import { IDataSW } from "../model/IDataSW";
-import { PeopleService } from "../service/PeopleService";
+import { VehiclesService } from "../service/VehiclesService";
 import colors from "../config/colors";
 import Card from "../UI/Card";
 import { NavigationProp } from "@react-navigation/native";
@@ -10,23 +10,23 @@ import SearchInput from "../UI/SearchInput";
 import Dropdown from "../UI/Dropdown";
 
 interface State {
-  data: IPerson[];
-  originalData: IPerson[];
+  data: IVehicle[];
+  originalData: IVehicle[];
   isLoading: boolean;
   search: string;
   pickerSelectedValue: string;
   pickerData: string[];
 }
 
-interface IPeopleProps {
+interface IVehiclesProps {
   navigation: NavigationProp<any>;
 }
-export default class People extends Component<IPeopleProps, State> {
-  private peopleService: PeopleService;
+export default class Vehicles extends Component<IVehiclesProps, State> {
+  private vehiclesService: VehiclesService;
 
   constructor(props) {
     super(props);
-    this.peopleService = new PeopleService(props.route.params.dataService);
+    this.vehiclesService = new VehiclesService(props.route.params.dataService);
 
     this.state = {
       data: [],
@@ -38,16 +38,17 @@ export default class People extends Component<IPeopleProps, State> {
     };
   }
 
-  private async getPeople() {
+  private async getVehicles() {
     try {
-      const response: IDataSW<IPerson[]> = await this.peopleService.getPeople();
+      const response: IDataSW<IVehicle[]> =
+        await this.vehiclesService.getVehicles();
       this.setState(
         {
           originalData: response.results,
         },
         () => this.getNextPage(response)
       );
-      this.filterPeople(this.state.pickerSelectedValue);
+      this.filterVehicles(this.state.pickerSelectedValue);
     } catch (error) {
       console.log(error);
     } finally {
@@ -55,33 +56,32 @@ export default class People extends Component<IPeopleProps, State> {
     }
   }
 
-  private getNextPage = async (previousResponse: IDataSW<IPerson[]>) => {
+  private getNextPage = async (previousResponse: IDataSW<IVehicle[]>) => {
     if (previousResponse.next) {
       try {
-        const response: IDataSW<IPerson[]> = await this.peopleService.getMore(
-          previousResponse.next
-        );
+        const response: IDataSW<IVehicle[]> =
+          await this.vehiclesService.getMore(previousResponse.next);
         const combinedResults = [...this.state.data, ...response.results];
         this.setState(
           {
             originalData: combinedResults,
             pickerData: [
-              ...new Set(combinedResults.map((item) => item.gender)),
+              ...new Set(combinedResults.map((item) => item.vehicle_class)),
             ],
           },
           () => this.getNextPage(response)
         );
-        this.filterPeople(this.state.pickerSelectedValue);
+        this.filterVehicles(this.state.pickerSelectedValue);
       } catch (error) {
         console.log(error);
       }
     }
   };
 
-  private searchPeople = async () => {
+  private searchVehicle = async () => {
     try {
-      const response: IDataSW<IPerson[]> =
-        await this.peopleService.searchPeople(this.state.search);
+      const response: IDataSW<IVehicle[]> =
+        await this.vehiclesService.searchVehicle(this.state.search);
       this.setState({ data: response.results });
     } catch (error) {
       console.log(error);
@@ -94,19 +94,19 @@ export default class People extends Component<IPeopleProps, State> {
     });
   };
 
-  private onSearchPerson = (search) => {
+  private onSearchVehicle = (search) => {
     this.setState({ search });
   };
 
   private onSetPickerSelectedValue = (pickerSelectedValue) => {
     this.setState({ pickerSelectedValue });
-    this.filterPeople(pickerSelectedValue);
+    this.filterVehicles(pickerSelectedValue);
   };
 
-  private filterPeople = (selectedOption) => {
+  private filterVehicles = (selectedOption) => {
     if (selectedOption !== "all") {
       let filteredData = this.state.originalData.filter(
-        (person) => person.gender === selectedOption
+        (person) => person.vehicle_class === selectedOption
       );
       this.setState({ data: filteredData });
     } else {
@@ -115,7 +115,7 @@ export default class People extends Component<IPeopleProps, State> {
   };
 
   componentDidMount() {
-    this.getPeople();
+    this.getVehicles();
   }
 
   render() {
@@ -125,8 +125,8 @@ export default class People extends Component<IPeopleProps, State> {
       <View style={styles.container}>
         <SearchInput
           placeholderText={"name"}
-          onSearchInput={(search) => this.onSearchPerson(search)}
-          searchItem={this.searchPeople}
+          onSearchInput={(search) => this.onSearchVehicle(search)}
+          searchItem={this.searchVehicle}
         />
         <Dropdown
           pickerData={["all", ...this.state.pickerData]}
@@ -141,15 +141,17 @@ export default class People extends Component<IPeopleProps, State> {
           <FlatList
             columnWrapperStyle={{ justifyContent: "space-between" }}
             numColumns={2}
-            data={data}
+            data={data.sort(
+              (a, b) => Number(b.cost_in_credits) - Number(a.cost_in_credits)
+            )}
             keyExtractor={(item) => item.url}
             extraData={data}
             renderItem={({ item }) => (
               <Card
                 itemName={item.name}
-                propertyOne={["Gender", item.gender]}
-                propertyTwo={["Birth year", item.birth_year]}
-                propertyThree={["Height", item.height + " cm"]}
+                propertyOne={["Cost in credits", item.cost_in_credits]}
+                propertyTwo={["Length", item.length]}
+                propertyThree={["Crew", item.crew]}
                 onClick={() => this.goToDetails(item)}
               ></Card>
             )}

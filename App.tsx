@@ -9,6 +9,10 @@ import { CacheService } from "./app/service/CacheService";
 import Autenthication from "./app/screens/Authentication";
 import colors from "./app/config/colors";
 import Films from "./app/screens/Films";
+import Starships from "./app/screens/Starships";
+import Vehicles from "./app/screens/Vehicles";
+import Species from "./app/screens/Species";
+import Planets from "./app/screens/Planets";
 
 const Stack = createNativeStackNavigator();
 
@@ -46,6 +50,26 @@ export default function App() {
         <Stack.Screen
           name="Films"
           component={Films}
+          initialParams={{ dataService: swapiService }}
+        />
+        <Stack.Screen
+          name="Starships"
+          component={Starships}
+          initialParams={{ dataService: swapiService }}
+        />
+        <Stack.Screen
+          name="Vehicles"
+          component={Vehicles}
+          initialParams={{ dataService: swapiService }}
+        />
+        <Stack.Screen
+          name="Species"
+          component={Species}
+          initialParams={{ dataService: swapiService }}
+        />
+        <Stack.Screen
+          name="Planets"
+          component={Planets}
           initialParams={{ dataService: swapiService }}
         />
         <Stack.Screen

@@ -1,4 +1,4 @@
-import { RouteProp } from "@react-navigation/native";
+import { NavigationProp, RouteProp } from "@react-navigation/native";
 import React, { Component } from "react";
 import { Text, View, StyleSheet, FlatList } from "react-native";
 import colors from "../config/colors";
@@ -6,9 +6,11 @@ import { IDetails } from "../model/IDetails";
 import { CacheService } from "../service/CacheService";
 import { IDataService } from "../service/IDataService";
 import { SwapiService } from "../service/SwapiService";
+import Icon from "react-native-vector-icons/FontAwesome";
 
 interface IDetailsProps {
   route: RouteProp<any>;
+  navigation: any;
 }
 
 interface State {
@@ -30,7 +32,19 @@ export default class Details extends Component<IDetailsProps, State> {
   private getDetail = async (url) => {
     try {
       const response = await this.dataService.getData(url);
-      return response.name ? response.name : response.title;
+      return (
+        <Text
+          style={styles.detailValue}
+          onPress={() =>
+            this.props.navigation.push("Details", {
+              details: response,
+            })
+          }
+        >
+          {response.name ? response.name : response.title + "   "}
+          <Icon style={{ fontSize: 16 }} name={"arrow-circle-right"}></Icon>
+        </Text>
+      );
     } catch (error) {
       console.log(error);
     }
@@ -77,9 +91,7 @@ export default class Details extends Component<IDetailsProps, State> {
                   <FlatList
                     data={this.state.newDetails[item]}
                     keyExtractor={(_arrayItem, index) => index.toString()}
-                    renderItem={({ item }) => (
-                      <Text style={styles.detailValue}>{item}</Text>
-                    )}
+                    renderItem={({ item }) => <View>{item}</View>}
                   />
                 ) : (
                   <Text style={styles.detailValue}>{"n/a"}</Text>
