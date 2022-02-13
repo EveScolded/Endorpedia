@@ -41,7 +41,9 @@ export default class Details extends Component<IDetailsProps, State> {
             })
           }
         >
-          {response.name ? response.name : response.title + "   "}
+          <Text>
+            {(response.name ? response.name : response.title) + "   "}
+          </Text>
           <Icon style={{ fontSize: 16 }} name={"arrow-circle-right"}></Icon>
         </Text>
       );
@@ -84,7 +86,7 @@ export default class Details extends Component<IDetailsProps, State> {
           renderItem={({ item }) => (
             <View style={styles.details}>
               <Text style={styles.detailName}>
-                {item[0].toUpperCase() + item.slice(1).replace("_", " ")}:{" "}
+                {item[0].toUpperCase() + item.slice(1).replace("_", " ")}:
               </Text>
               {Array.isArray(this.state.newDetails[item]) ? (
                 this.state.newDetails[item].length > 0 ? (
