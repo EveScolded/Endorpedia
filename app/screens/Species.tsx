@@ -107,7 +107,7 @@ export default class Species extends Component<ISpeciesProps, State> {
   private filterSpecies = (selectedOption) => {
     if (selectedOption !== "all") {
       let filteredData = this.state.originalData.filter(
-        (person) => person.classification === selectedOption
+        (item) => item.classification === selectedOption
       );
       this.setState({ data: filteredData });
     } else {

@@ -107,7 +107,7 @@ export default class People extends Component<IPlanetsProps, State> {
   private filterPlanets = (selectedOption) => {
     if (selectedOption !== "all") {
       let filteredData = this.state.originalData.filter(
-        (person) => person.climate === selectedOption
+        (item) => item.climate === selectedOption
       );
       this.setState({ data: filteredData });
     } else {

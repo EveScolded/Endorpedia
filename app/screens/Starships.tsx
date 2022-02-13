@@ -8,6 +8,7 @@ import Card from "../UI/Card";
 import { NavigationProp } from "@react-navigation/native";
 import SearchInput from "../UI/SearchInput";
 import Dropdown from "../UI/Dropdown";
+import FilterSlider from "../UI/FilterSlider";
 
 interface State {
   data: IStarship[];
@@ -16,6 +17,7 @@ interface State {
   search: string;
   pickerSelectedValue: string;
   pickerData: string[];
+  sliderValue: number;
 }
 
 interface IStarshipProps {
@@ -37,6 +39,7 @@ export default class People extends Component<IStarshipProps, State> {
       search: "",
       pickerSelectedValue: "all",
       pickerData: [],
+      sliderValue: 20,
     };
   }
 
@@ -50,7 +53,7 @@ export default class People extends Component<IStarshipProps, State> {
         },
         () => this.getNextPage(response)
       );
-      this.filterStarship(this.state.pickerSelectedValue);
+      this.filterStarship();
     } catch (error) {
       console.log(error);
     } finally {
@@ -75,7 +78,7 @@ export default class People extends Component<IStarshipProps, State> {
           },
           () => this.getNextPage(response)
         );
-        this.filterStarship(this.state.pickerSelectedValue);
+        this.filterStarship();
       } catch (error) {
         console.log(error);
       }
@@ -103,27 +106,49 @@ export default class People extends Component<IStarshipProps, State> {
   };
 
   private onSetPickerSelectedValue = (pickerSelectedValue) => {
-    this.setState({ pickerSelectedValue });
-    this.filterStarship(pickerSelectedValue);
+    this.setState({ pickerSelectedValue }, this.filterStarship);
   };
 
-  private filterStarship = (selectedOption) => {
-    if (selectedOption !== "all") {
-      let filteredData = this.state.originalData.filter(
-        (person) => person.starship_class === selectedOption
+  private filterStarship = () => {
+    let filteredData = this.state.originalData;
+    if (this.state.pickerSelectedValue !== "all") {
+      filteredData = filteredData.filter(
+        (item) =>
+          item.starship_class.toLowerCase() === this.state.pickerSelectedValue
       );
-      this.setState({ data: filteredData });
-    } else {
-      this.setState({ data: this.state.originalData });
     }
+    filteredData = filteredData.filter((item) => {
+      if (item.length === "unknown") return item;
+      if (Number(item.length.replace(",", "")) >= this.state.sliderValue) {
+        return item;
+      }
+    });
+    this.setState({ data: filteredData });
+  };
+
+  private onSliderValueChange = (value: number) => {
+    this.setState({ sliderValue: value[0] }, this.filterStarship);
   };
 
   componentDidMount() {
     this.getStarship();
   }
 
+  private getLengths(data: IStarship[]): number[] {
+    const lengths: number[] = data.reduce((filtered, vehicle) => {
+      const length = Number(vehicle.length);
+      if (!isNaN(length)) {
+        filtered.push(length);
+      }
+      return filtered;
+    }, []);
+    return lengths;
+  }
+
   render() {
     const { data, isLoading } = this.state;
+    const lenghts: number[] = this.getLengths(data);
+    const maxLength = lenghts.length > 0 ? Math.max(...lenghts) : 100;
 
     return (
       <View style={styles.container}>
@@ -135,9 +160,13 @@ export default class People extends Component<IStarshipProps, State> {
         <Dropdown
           pickerData={["all", ...this.state.pickerData]}
           pickerSelectedValue={this.state.pickerSelectedValue}
-          onSetPickerSelectedValue={(pickerSelectedValue) =>
-            this.onSetPickerSelectedValue(pickerSelectedValue)
-          }
+          onSetPickerSelectedValue={this.onSetPickerSelectedValue}
+        />
+        <FilterSlider
+          sliderValue={this.state.sliderValue}
+          max={maxLength}
+          min={0}
+          onValueChange={(value) => this.onSliderValueChange(value)}
         />
         {isLoading ? (
           <ActivityIndicator />
@@ -145,17 +174,23 @@ export default class People extends Component<IStarshipProps, State> {
           <FlatList
             columnWrapperStyle={{ justifyContent: "space-between" }}
             numColumns={2}
-            data={data.sort(
-              (a, b) => Number(b.cost_in_credits) - Number(a.cost_in_credits)
-            )}
+            data={data}
             keyExtractor={(item) => item.url}
             extraData={data}
             renderItem={({ item }) => (
               <Card
                 itemName={item.name}
-                propertyOne={["Cost in credits", item.cost_in_credits]}
-                propertyTwo={["Length", item.length]}
-                propertyThree={["Crew", item.crew]}
+                propertyOne={[
+                  "Cost in credits",
+                  !isNaN(Number(item.cost_in_credits))
+                    ? Number(item.cost_in_credits).toLocaleString()
+                    : item.cost_in_credits,
+                ]}
+                propertyTwo={[
+                  "Length",
+                  Number(item.length.replace(".", "")).toLocaleString(),
+                ]}
+                propertyThree={["Crew", item.crew.replace(",", " ")]}
                 onClick={() => this.goToDetails(item)}
               ></Card>
             )}

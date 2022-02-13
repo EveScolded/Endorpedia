@@ -106,7 +106,7 @@ export default class Vehicles extends Component<IVehiclesProps, State> {
   private filterVehicles = (selectedOption) => {
     if (selectedOption !== "all") {
       let filteredData = this.state.originalData.filter(
-        (person) => person.vehicle_class === selectedOption
+        (item) => item.vehicle_class === selectedOption
       );
       this.setState({ data: filteredData });
     } else {
@@ -141,9 +141,7 @@ export default class Vehicles extends Component<IVehiclesProps, State> {
           <FlatList
             columnWrapperStyle={{ justifyContent: "space-between" }}
             numColumns={2}
-            data={data.sort(
-              (a, b) => Number(b.cost_in_credits) - Number(a.cost_in_credits)
-            )}
+            data={data}
             keyExtractor={(item) => item.url}
             extraData={data}
             renderItem={({ item }) => (
