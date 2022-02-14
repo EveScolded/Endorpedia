@@ -69,11 +69,23 @@ export default class Films extends Component<IFilmsProps, State> {
     });
   };
 
+  private romans = [0, "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX"];
+
+  private renderCard = (item) => {
+    return (
+      <Card
+        itemName={item.title}
+        propertyOne={["Episode", this.romans[item.episode_id].toLocaleString()]}
+        propertyTwo={["Director", item.director]}
+        propertyThree={["Release date", item.release_date]}
+        onClick={() => this.goToDetails(item)}
+      ></Card>
+    );
+  };
+
   componentDidMount() {
     this.getFilms();
   }
-
-  private romans = [0, "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX"];
 
   render() {
     const { originalData, isLoading } = this.state;
@@ -87,18 +99,7 @@ export default class Films extends Component<IFilmsProps, State> {
             data={originalData.sort((a, b) => a.episode_id - b.episode_id)}
             keyExtractor={(item) => item.url}
             extraData={originalData}
-            renderItem={({ item }) => (
-              <Card
-                itemName={item.title}
-                propertyOne={[
-                  "Episode",
-                  this.romans[item.episode_id].toLocaleString(),
-                ]}
-                propertyTwo={["Director", item.director]}
-                propertyThree={["Release date", item.release_date]}
-                onClick={() => this.goToDetails(item)}
-              ></Card>
-            )}
+            renderItem={({ item }) => this.renderCard(item)}
           />
         )}
       </View>

@@ -114,6 +114,18 @@ export default class People extends Component<IPeopleProps, State> {
     }
   };
 
+  private renderCard = (item) => {
+    return (
+      <Card
+        itemName={item.name}
+        propertyOne={["Gender", item.gender]}
+        propertyTwo={["Birth year", item.birth_year]}
+        propertyThree={["Height", item.height + " cm"]}
+        onClick={() => this.goToDetails(item)}
+      ></Card>
+    );
+  };
+
   componentDidMount() {
     this.getPeople();
   }
@@ -125,15 +137,13 @@ export default class People extends Component<IPeopleProps, State> {
       <View style={styles.container}>
         <SearchInput
           placeholderText={"name"}
-          onSearchInput={(search) => this.onSearchPerson(search)}
+          onSearchInput={this.onSearchPerson}
           searchItem={this.searchPeople}
         />
         <Dropdown
           pickerData={["all", ...this.state.pickerData]}
           pickerSelectedValue={this.state.pickerSelectedValue}
-          onSetPickerSelectedValue={(pickerSelectedValue) =>
-            this.onSetPickerSelectedValue(pickerSelectedValue)
-          }
+          onSetPickerSelectedValue={this.onSetPickerSelectedValue}
         />
         {isLoading ? (
           <ActivityIndicator />
@@ -144,15 +154,7 @@ export default class People extends Component<IPeopleProps, State> {
             data={data}
             keyExtractor={(item) => item.url}
             extraData={data}
-            renderItem={({ item }) => (
-              <Card
-                itemName={item.name}
-                propertyOne={["Gender", item.gender]}
-                propertyTwo={["Birth year", item.birth_year]}
-                propertyThree={["Height", item.height + " cm"]}
-                onClick={() => this.goToDetails(item)}
-              ></Card>
-            )}
+            renderItem={({ item }) => this.renderCard(item)}
           />
         )}
       </View>

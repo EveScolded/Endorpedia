@@ -115,6 +115,18 @@ export default class Species extends Component<ISpeciesProps, State> {
     }
   };
 
+  private renderCard = (item) => {
+    return (
+      <Card
+        itemName={item.name}
+        propertyOne={["Classification", item.classification]}
+        propertyTwo={["Average height", item.average_height]}
+        propertyThree={["Average lifespan", item.average_lifespan]}
+        onClick={() => this.goToDetails(item)}
+      ></Card>
+    );
+  };
+
   componentDidMount() {
     this.getSpecies();
   }
@@ -126,15 +138,13 @@ export default class Species extends Component<ISpeciesProps, State> {
       <View style={styles.container}>
         <SearchInput
           placeholderText={"name"}
-          onSearchInput={(search) => this.onSearchPerson(search)}
+          onSearchInput={this.onSearchPerson}
           searchItem={this.searchSpecies}
         />
         <Dropdown
           pickerData={["all", ...this.state.pickerData]}
           pickerSelectedValue={this.state.pickerSelectedValue}
-          onSetPickerSelectedValue={(pickerSelectedValue) =>
-            this.onSetPickerSelectedValue(pickerSelectedValue)
-          }
+          onSetPickerSelectedValue={this.onSetPickerSelectedValue}
         />
         {isLoading ? (
           <ActivityIndicator />
@@ -145,15 +155,7 @@ export default class Species extends Component<ISpeciesProps, State> {
             data={data}
             keyExtractor={(item) => item.url}
             extraData={data}
-            renderItem={({ item }) => (
-              <Card
-                itemName={item.name}
-                propertyOne={["Classification", item.classification]}
-                propertyTwo={["Average height", item.average_height]}
-                propertyThree={["Average lifespan", item.average_lifespan]}
-                onClick={() => this.goToDetails(item)}
-              ></Card>
-            )}
+            renderItem={({ item }) => this.renderCard(item)}
           />
         )}
       </View>

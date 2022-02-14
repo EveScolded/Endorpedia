@@ -83,28 +83,30 @@ export default class Details extends Component<IDetailsProps, State> {
         <FlatList
           data={Object.keys(this.state.newDetails)}
           keyExtractor={(item) => item}
-          renderItem={({ item }) => (
-            <View style={styles.details}>
-              <Text style={styles.detailName}>
-                {item[0].toUpperCase() + item.slice(1).replaceAll("_", " ")}:
-              </Text>
-              {Array.isArray(this.state.newDetails[item]) ? (
-                this.state.newDetails[item].length > 0 ? (
-                  <FlatList
-                    data={this.state.newDetails[item]}
-                    keyExtractor={(_arrayItem, index) => index.toString()}
-                    renderItem={({ item }) => <View>{item}</View>}
-                  />
+          renderItem={({ item }) => {
+            const header =
+              item[0].toUpperCase() + item.slice(1).replaceAll("_", " ");
+            return (
+              <View style={styles.details}>
+                <Text style={styles.detailName}>{header}:</Text>
+                {Array.isArray(this.state.newDetails[item]) ? (
+                  this.state.newDetails[item].length > 0 ? (
+                    <FlatList
+                      data={this.state.newDetails[item]}
+                      keyExtractor={(_arrayItem, index) => index.toString()}
+                      renderItem={({ item }) => <View>{item}</View>}
+                    />
+                  ) : (
+                    <Text style={styles.detailValue}>{"n/a"}</Text>
+                  )
                 ) : (
-                  <Text style={styles.detailValue}>{"n/a"}</Text>
-                )
-              ) : (
-                <Text style={styles.detailValue}>
-                  {this.state.newDetails[item]}
-                </Text>
-              )}
-            </View>
-          )}
+                  <Text style={styles.detailValue}>
+                    {this.state.newDetails[item]}
+                  </Text>
+                )}
+              </View>
+            );
+          }}
         />
       </View>
     );

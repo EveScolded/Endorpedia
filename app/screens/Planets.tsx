@@ -8,6 +8,7 @@ import Card from "../UI/Card";
 import { NavigationProp } from "@react-navigation/native";
 import SearchInput from "../UI/SearchInput";
 import Dropdown from "../UI/Dropdown";
+import FilterSlider from "../UI/FilterSlider";
 
 interface State {
   data: IPlanet[];
@@ -16,6 +17,7 @@ interface State {
   search: string;
   pickerSelectedValue: string;
   pickerData: string[];
+  sliderValue: number;
 }
 
 interface IPlanetsProps {
@@ -35,6 +37,7 @@ export default class People extends Component<IPlanetsProps, State> {
       search: "",
       pickerSelectedValue: "all",
       pickerData: [],
+      sliderValue: 0,
     };
   }
 
@@ -48,7 +51,7 @@ export default class People extends Component<IPlanetsProps, State> {
         },
         () => this.getNextPage(response)
       );
-      this.filterPlanets(this.state.pickerSelectedValue);
+      this.filterPlanets();
     } catch (error) {
       console.log(error);
     } finally {
@@ -72,7 +75,7 @@ export default class People extends Component<IPlanetsProps, State> {
           },
           () => this.getNextPage(response)
         );
-        this.filterPlanets(this.state.pickerSelectedValue);
+        this.filterPlanets();
       } catch (error) {
         console.log(error);
       }
@@ -100,19 +103,56 @@ export default class People extends Component<IPlanetsProps, State> {
   };
 
   private onSetPickerSelectedValue = (pickerSelectedValue) => {
-    this.setState({ pickerSelectedValue });
-    this.filterPlanets(pickerSelectedValue);
+    this.setState({ pickerSelectedValue }, this.filterPlanets);
   };
 
-  private filterPlanets = (selectedOption) => {
-    if (selectedOption !== "all") {
-      let filteredData = this.state.originalData.filter(
-        (item) => item.climate === selectedOption
+  private filterPlanets = () => {
+    let filteredData = this.state.originalData;
+    if (this.state.pickerSelectedValue !== "all") {
+      filteredData = filteredData.filter(
+        (item) => item.climate.toLowerCase() === this.state.pickerSelectedValue
       );
-      this.setState({ data: filteredData });
-    } else {
-      this.setState({ data: this.state.originalData });
     }
+    filteredData = filteredData.filter((item) => {
+      if (item.diameter === "unknown" && this.state.sliderValue === 0)
+        return item;
+      if (Number(item.diameter.replace(",", "")) >= this.state.sliderValue) {
+        return item;
+      }
+    });
+    this.setState({ data: filteredData });
+  };
+
+  private onSliderValueChange = (value: number) => {
+    this.setState({ sliderValue: value[0] }, this.filterPlanets);
+  };
+
+  private getDiameter(data: IPlanet[]): number[] {
+    const diameters: number[] = data.reduce((filtered, planet) => {
+      const diameter = Number(planet.diameter);
+      if (!isNaN(diameter)) {
+        filtered.push(diameter);
+      }
+      return filtered;
+    }, []);
+    return diameters;
+  }
+
+  private renderCard = (item) => {
+    return (
+      <Card
+        itemName={item.name}
+        propertyOne={[
+          "Diameter",
+          !isNaN(Number(item.diameter))
+            ? Number(item.diameter).toLocaleString()
+            : item.diameter,
+        ]}
+        propertyTwo={["Rotation period", item.rotation_period]}
+        propertyThree={["Orbital period", item.orbital_period]}
+        onClick={() => this.goToDetails(item)}
+      ></Card>
+    );
   };
 
   componentDidMount() {
@@ -121,20 +161,27 @@ export default class People extends Component<IPlanetsProps, State> {
 
   render() {
     const { data, isLoading } = this.state;
+    const diameter: number[] = this.getDiameter(data);
+    const maxDiameter = diameter.length > 0 ? Math.max(...diameter) : 100;
 
     return (
       <View style={styles.container}>
         <SearchInput
           placeholderText={"name"}
-          onSearchInput={(search) => this.onSearchPlanet(search)}
+          onSearchInput={this.onSearchPlanet}
           searchItem={this.searchPlanet}
         />
         <Dropdown
           pickerData={["all", ...this.state.pickerData]}
           pickerSelectedValue={this.state.pickerSelectedValue}
-          onSetPickerSelectedValue={(pickerSelectedValue) =>
-            this.onSetPickerSelectedValue(pickerSelectedValue)
-          }
+          onSetPickerSelectedValue={this.onSetPickerSelectedValue}
+        />
+        <FilterSlider
+          thumbTitle={"Diameter"}
+          sliderValue={this.state.sliderValue}
+          max={maxDiameter}
+          min={0}
+          onValueChange={this.onSliderValueChange}
         />
         {isLoading ? (
           <ActivityIndicator />
@@ -142,18 +189,10 @@ export default class People extends Component<IPlanetsProps, State> {
           <FlatList
             columnWrapperStyle={{ justifyContent: "space-between" }}
             numColumns={2}
-            data={data.sort((a, b) => Number(b.diameter) - Number(a.diameter))}
+            data={data}
             keyExtractor={(item) => item.url}
             extraData={data}
-            renderItem={({ item }) => (
-              <Card
-                itemName={item.name}
-                propertyOne={["Diameter", item.diameter]}
-                propertyTwo={["Rotation period", item.rotation_period]}
-                propertyThree={["Orbital period", item.orbital_period]}
-                onClick={() => this.goToDetails(item)}
-              ></Card>
-            )}
+            renderItem={({ item }) => this.renderCard(item)}
           />
         )}
       </View>

@@ -8,6 +8,7 @@ import Card from "../UI/Card";
 import { NavigationProp } from "@react-navigation/native";
 import SearchInput from "../UI/SearchInput";
 import Dropdown from "../UI/Dropdown";
+import FilterSlider from "../UI/FilterSlider";
 
 interface State {
   data: IVehicle[];
@@ -16,6 +17,7 @@ interface State {
   search: string;
   pickerSelectedValue: string;
   pickerData: string[];
+  sliderValue: number;
 }
 
 interface IVehiclesProps {
@@ -35,6 +37,7 @@ export default class Vehicles extends Component<IVehiclesProps, State> {
       search: "",
       pickerSelectedValue: "all",
       pickerData: [],
+      sliderValue: 0,
     };
   }
 
@@ -48,7 +51,7 @@ export default class Vehicles extends Component<IVehiclesProps, State> {
         },
         () => this.getNextPage(response)
       );
-      this.filterVehicles(this.state.pickerSelectedValue);
+      this.filterVehicles();
     } catch (error) {
       console.log(error);
     } finally {
@@ -71,7 +74,7 @@ export default class Vehicles extends Component<IVehiclesProps, State> {
           },
           () => this.getNextPage(response)
         );
-        this.filterVehicles(this.state.pickerSelectedValue);
+        this.filterVehicles();
       } catch (error) {
         console.log(error);
       }
@@ -99,19 +102,62 @@ export default class Vehicles extends Component<IVehiclesProps, State> {
   };
 
   private onSetPickerSelectedValue = (pickerSelectedValue) => {
-    this.setState({ pickerSelectedValue });
-    this.filterVehicles(pickerSelectedValue);
+    this.setState({ pickerSelectedValue }, this.filterVehicles);
   };
 
-  private filterVehicles = (selectedOption) => {
-    if (selectedOption !== "all") {
-      let filteredData = this.state.originalData.filter(
-        (item) => item.vehicle_class === selectedOption
+  private filterVehicles = () => {
+    let filteredData = this.state.originalData;
+    if (this.state.pickerSelectedValue !== "all") {
+      filteredData = filteredData.filter(
+        (item) =>
+          item.vehicle_class.toLowerCase() === this.state.pickerSelectedValue
       );
-      this.setState({ data: filteredData });
-    } else {
-      this.setState({ data: this.state.originalData });
     }
+    filteredData = filteredData.filter((item) => {
+      if (item.cost_in_credits === "unknown" && this.state.sliderValue === 0)
+        return item;
+      if (
+        Number(item.cost_in_credits.replace(",", "")) >= this.state.sliderValue
+      ) {
+        return item;
+      }
+    });
+    this.setState({ data: filteredData });
+  };
+
+  private onSliderValueChange = (value: number) => {
+    this.setState({ sliderValue: value[0] }, this.filterVehicles);
+  };
+
+  private getCosts(data: IVehicle[]): number[] {
+    const costs: number[] = data.reduce((filtered, starship) => {
+      const cost = Number(starship.cost_in_credits);
+      if (!isNaN(cost)) {
+        filtered.push(cost);
+      }
+      return filtered;
+    }, []);
+    return costs;
+  }
+
+  private renderCard = (item) => {
+    return (
+      <Card
+        itemName={item.name}
+        propertyOne={[
+          "Cost in credits",
+          !isNaN(Number(item.cost_in_credits))
+            ? Number(item.cost_in_credits).toLocaleString()
+            : item.cost_in_credits,
+        ]}
+        propertyTwo={[
+          "Length",
+          Number(item.length.replace(".", "")).toLocaleString(),
+        ]}
+        propertyThree={["Crew", item.crew.replace(",", " ")]}
+        onClick={() => this.goToDetails(item)}
+      ></Card>
+    );
   };
 
   componentDidMount() {
@@ -120,20 +166,27 @@ export default class Vehicles extends Component<IVehiclesProps, State> {
 
   render() {
     const { data, isLoading } = this.state;
+    const costs: number[] = this.getCosts(data);
+    const maxCost = costs.length > 0 ? Math.max(...costs) : 100;
 
     return (
       <View style={styles.container}>
         <SearchInput
-          placeholderText={"name"}
-          onSearchInput={(search) => this.onSearchVehicle(search)}
+          placeholderText={"name or model"}
+          onSearchInput={this.onSearchVehicle}
           searchItem={this.searchVehicle}
         />
         <Dropdown
           pickerData={["all", ...this.state.pickerData]}
           pickerSelectedValue={this.state.pickerSelectedValue}
-          onSetPickerSelectedValue={(pickerSelectedValue) =>
-            this.onSetPickerSelectedValue(pickerSelectedValue)
-          }
+          onSetPickerSelectedValue={this.onSetPickerSelectedValue}
+        />
+        <FilterSlider
+          thumbTitle={"Cost in credits"}
+          sliderValue={this.state.sliderValue}
+          max={maxCost}
+          min={0}
+          onValueChange={this.onSliderValueChange}
         />
         {isLoading ? (
           <ActivityIndicator />
@@ -144,15 +197,7 @@ export default class Vehicles extends Component<IVehiclesProps, State> {
             data={data}
             keyExtractor={(item) => item.url}
             extraData={data}
-            renderItem={({ item }) => (
-              <Card
-                itemName={item.name}
-                propertyOne={["Cost in credits", item.cost_in_credits]}
-                propertyTwo={["Length", item.length]}
-                propertyThree={["Crew", item.crew]}
-                onClick={() => this.goToDetails(item)}
-              ></Card>
-            )}
+            renderItem={({ item }) => this.renderCard(item)}
           />
         )}
       </View>
@@ -163,6 +208,7 @@ export default class Vehicles extends Component<IVehiclesProps, State> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    justifyContent: "flex-start",
     backgroundColor: colors.mainBackground,
     alignItems: "center",
   },

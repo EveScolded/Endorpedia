@@ -8,6 +8,7 @@ interface IFilterSliderProps {
   max?: number;
   min?: number;
   onValueChange: (value) => void;
+  thumbTitle: string;
 }
 
 export default class FilterSlider extends Component<IFilterSliderProps, {}> {
@@ -17,8 +18,7 @@ export default class FilterSlider extends Component<IFilterSliderProps, {}> {
 
   private CustomThumb = () => (
     <View style={styles.thumb}>
-      <Text>Length</Text>
-      <Text>{Math.round(this.props.sliderValue)}</Text>
+      <Text>{this.props.thumbTitle}</Text>
     </View>
   );
   render() {
@@ -41,7 +41,6 @@ export default class FilterSlider extends Component<IFilterSliderProps, {}> {
 const styles = StyleSheet.create({
   container: {
     width: 354,
-    flex: 1,
     marginLeft: 10,
     marginRight: 10,
     marginTop: 25,

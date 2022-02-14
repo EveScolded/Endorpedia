@@ -17,7 +17,6 @@ interface State {
   search: string;
   pickerSelectedValue: string;
   pickerData: string[];
-  sliderValue: number;
 }
 
 interface IStarshipProps {
@@ -39,7 +38,6 @@ export default class People extends Component<IStarshipProps, State> {
       search: "",
       pickerSelectedValue: "all",
       pickerData: [],
-      sliderValue: 20,
     };
   }
 
@@ -110,63 +108,54 @@ export default class People extends Component<IStarshipProps, State> {
   };
 
   private filterStarship = () => {
-    let filteredData = this.state.originalData;
     if (this.state.pickerSelectedValue !== "all") {
-      filteredData = filteredData.filter(
-        (item) =>
-          item.starship_class.toLowerCase() === this.state.pickerSelectedValue
+      let filteredData = this.state.originalData.filter(
+        (item) => item.starship_class === this.state.pickerSelectedValue
       );
+      this.setState({ data: filteredData });
+    } else {
+      this.setState({ data: this.state.originalData });
     }
-    filteredData = filteredData.filter((item) => {
-      if (item.length === "unknown") return item;
-      if (Number(item.length.replace(",", "")) >= this.state.sliderValue) {
-        return item;
-      }
-    });
-    this.setState({ data: filteredData });
   };
 
-  private onSliderValueChange = (value: number) => {
-    this.setState({ sliderValue: value[0] }, this.filterStarship);
+  private renderCard = (item) => {
+    return (
+      <Card
+        itemName={item.name}
+        propertyOne={[
+          "Cost in credits",
+          !isNaN(Number(item.cost_in_credits))
+            ? Number(item.cost_in_credits).toLocaleString()
+            : item.cost_in_credits,
+        ]}
+        propertyTwo={[
+          "Length",
+          Number(item.length.replace(".", "")).toLocaleString(),
+        ]}
+        propertyThree={["Crew", item.crew.replace(",", " ")]}
+        onClick={() => this.goToDetails(item)}
+      ></Card>
+    );
   };
 
   componentDidMount() {
     this.getStarship();
   }
 
-  private getLengths(data: IStarship[]): number[] {
-    const lengths: number[] = data.reduce((filtered, vehicle) => {
-      const length = Number(vehicle.length);
-      if (!isNaN(length)) {
-        filtered.push(length);
-      }
-      return filtered;
-    }, []);
-    return lengths;
-  }
-
   render() {
     const { data, isLoading } = this.state;
-    const lenghts: number[] = this.getLengths(data);
-    const maxLength = lenghts.length > 0 ? Math.max(...lenghts) : 100;
 
     return (
       <View style={styles.container}>
         <SearchInput
-          placeholderText={"name"}
-          onSearchInput={(search) => this.onSearchStarship(search)}
+          placeholderText={"name or model"}
+          onSearchInput={this.onSearchStarship}
           searchItem={this.searchStarship}
         />
         <Dropdown
           pickerData={["all", ...this.state.pickerData]}
           pickerSelectedValue={this.state.pickerSelectedValue}
           onSetPickerSelectedValue={this.onSetPickerSelectedValue}
-        />
-        <FilterSlider
-          sliderValue={this.state.sliderValue}
-          max={maxLength}
-          min={0}
-          onValueChange={(value) => this.onSliderValueChange(value)}
         />
         {isLoading ? (
           <ActivityIndicator />
@@ -177,23 +166,7 @@ export default class People extends Component<IStarshipProps, State> {
             data={data}
             keyExtractor={(item) => item.url}
             extraData={data}
-            renderItem={({ item }) => (
-              <Card
-                itemName={item.name}
-                propertyOne={[
-                  "Cost in credits",
-                  !isNaN(Number(item.cost_in_credits))
-                    ? Number(item.cost_in_credits).toLocaleString()
-                    : item.cost_in_credits,
-                ]}
-                propertyTwo={[
-                  "Length",
-                  Number(item.length.replace(".", "")).toLocaleString(),
-                ]}
-                propertyThree={["Crew", item.crew.replace(",", " ")]}
-                onClick={() => this.goToDetails(item)}
-              ></Card>
-            )}
+            renderItem={({ item }) => this.renderCard(item)}
           />
         )}
       </View>
