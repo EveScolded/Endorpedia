@@ -52,6 +52,34 @@ export default class Details extends Component<IDetailsProps, State> {
     }
   };
 
+  private renderDetail = (propName: string) => {
+    const header =
+      propName[0].toUpperCase() + propName.slice(1).replaceAll("_", " ");
+    if (propName.toLowerCase() === "url") return <></>;
+
+    return (
+      <View style={styles.details}>
+        <Text style={styles.detailName}>{header}:</Text>
+
+        {Array.isArray(this.state.newDetails[propName]) ? (
+          this.state.newDetails[propName].length > 0 ? (
+            <FlatList
+              data={this.state.newDetails[propName]}
+              keyExtractor={(_arrayItem, index) => index.toString()}
+              renderItem={({ item }) => <View>{item}</View>}
+            />
+          ) : (
+            <Text style={styles.detailValue}>{"n/a"}</Text>
+          )
+        ) : (
+          <Text style={styles.detailValue}>
+            {this.state.newDetails[propName]}
+          </Text>
+        )}
+      </View>
+    );
+  };
+
   async componentDidMount(): Promise<void> {
     const { details } = this.props.route.params;
     const newDetails = { ...details };
@@ -83,30 +111,7 @@ export default class Details extends Component<IDetailsProps, State> {
         <FlatList
           data={Object.keys(this.state.newDetails)}
           keyExtractor={(item) => item}
-          renderItem={({ item }) => {
-            const header =
-              item[0].toUpperCase() + item.slice(1).replaceAll("_", " ");
-            return (
-              <View style={styles.details}>
-                <Text style={styles.detailName}>{header}:</Text>
-                {Array.isArray(this.state.newDetails[item]) ? (
-                  this.state.newDetails[item].length > 0 ? (
-                    <FlatList
-                      data={this.state.newDetails[item]}
-                      keyExtractor={(_arrayItem, index) => index.toString()}
-                      renderItem={({ item }) => <View>{item}</View>}
-                    />
-                  ) : (
-                    <Text style={styles.detailValue}>{"n/a"}</Text>
-                  )
-                ) : (
-                  <Text style={styles.detailValue}>
-                    {this.state.newDetails[item]}
-                  </Text>
-                )}
-              </View>
-            );
-          }}
+          renderItem={({ item }) => this.renderDetail(item)}
         />
       </View>
     );
