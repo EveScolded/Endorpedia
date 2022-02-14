@@ -1,7 +1,7 @@
 {
   "files": {
-    "app.js": "/Endorpedia/static/js/app.589a32af.chunk.js",
-    "app.js.map": "/Endorpedia/static/js/app.589a32af.chunk.js.map",
+    "app.js": "/Endorpedia/static/js/app.d53b9e63.chunk.js",
+    "app.js.map": "/Endorpedia/static/js/app.d53b9e63.chunk.js.map",
     "runtime~app.js": "/Endorpedia/static/js/runtime~app.792c4645.js",
     "runtime~app.js.map": "/Endorpedia/static/js/runtime~app.792c4645.js.map",
     "static/js/2.02e9163f.chunk.js": "/Endorpedia/static/js/2.02e9163f.chunk.js",
@@ -18,6 +18,6 @@
   "entrypoints": [
     "static/js/runtime~app.792c4645.js",
     "static/js/2.02e9163f.chunk.js",
-    "static/js/app.589a32af.chunk.js"
+    "static/js/app.d53b9e63.chunk.js"
   ]
 }
