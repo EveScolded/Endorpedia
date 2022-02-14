@@ -1,0 +1,23 @@
+{
+  "files": {
+    "app.js": "/Endorpedia/static/js/app.b4df100c.chunk.js",
+    "app.js.map": "/Endorpedia/static/js/app.b4df100c.chunk.js.map",
+    "runtime~app.js": "/Endorpedia/static/js/runtime~app.792c4645.js",
+    "runtime~app.js.map": "/Endorpedia/static/js/runtime~app.792c4645.js.map",
+    "static/js/2.2bdbcde8.chunk.js": "/Endorpedia/static/js/2.2bdbcde8.chunk.js",
+    "static/js/2.2bdbcde8.chunk.js.map": "/Endorpedia/static/js/2.2bdbcde8.chunk.js.map",
+    "fonts/FontAwesome.ttf": "/Endorpedia/./fonts/FontAwesome.ttf",
+    "index.html": "/Endorpedia/index.html",
+    "manifest.json": "/Endorpedia/manifest.json",
+    "serve.json": "/Endorpedia/serve.json",
+    "static/js/2.2bdbcde8.chunk.js.LICENSE.txt": "/Endorpedia/static/js/2.2bdbcde8.chunk.js.LICENSE.txt",
+    "static/media/background.jpg": "/Endorpedia/static/media/background.4c012343.jpg",
+    "static/media/grogu.png": "/Endorpedia/static/media/grogu.633152b2.png",
+    "static/media/searchIcon.png": "/Endorpedia/static/media/searchIcon.ed97a9c5.png"
+  },
+  "entrypoints": [
+    "static/js/runtime~app.792c4645.js",
+    "static/js/2.2bdbcde8.chunk.js",
+    "static/js/app.b4df100c.chunk.js"
+  ]
+}
