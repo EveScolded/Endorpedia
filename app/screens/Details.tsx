@@ -1,4 +1,4 @@
-import { NavigationProp, RouteProp } from "@react-navigation/native";
+import { RouteProp } from "@react-navigation/native";
 import React, { Component } from "react";
 import { Text, View, StyleSheet, FlatList } from "react-native";
 import colors from "../config/colors";

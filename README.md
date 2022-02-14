@@ -1,8 +1,6 @@
 # Endorpedia - Star Wars encyclopedia in React Native
 
 <p>
-  <!-- iOS -->
-  <img alt="Supports Expo iOS" longdesc="Supports Expo iOS" src="https://img.shields.io/badge/iOS-4630EB.svg?style=flat-square&logo=APPLE&labelColor=999999&logoColor=fff" />
   <!-- Android -->
   <img alt="Supports Expo Android" longdesc="Supports Expo Android" src="https://img.shields.io/badge/Android-4630EB.svg?style=flat-square&logo=ANDROID&labelColor=A4C639&logoColor=fff" />
   <!-- Web -->
@@ -11,18 +9,35 @@
 
 ## 🚀 How to use
 
-#### Creating a new project
+#### 🛫 Start project
 
 - Install the CLI: `npm i -g expo-cli`
-- Create a project: `npx create-react-native-app -t with-typescript`
-- `cd` into the project
+- Clone or download project
+- Run `npm i`
+- Start project with `npm start`
+- Install Expo Go on your mobile device
+- Scan QR code from console or automatically opened webpage
 
-### Adding TypeScript to existing projects
+#### 📝 Notes
 
-- Create a blank TypeScript config: `touch tsconfig.json`
-- Run `expo start` to automatically configure TypeScript
-- Rename files to TypeScript, `.tsx` for React components and `.ts` for plain typescript files
+Use those credentials to login to the app:
 
-## 📝 Notes
+- Login: Woo
+- Password: kiee
 
-- [Expo TypeScript guide](https://docs.expo.dev/versions/latest/guides/typescript/)
+#### 🔍 About project
+
+It's my first contact with react native and mobile development. The project contains:
+
+- Fetches data from [Star War API](https://swapi.dev/)
+- Saves API data to Async Storage
+- Contains mock authentication which saves token in Secure Storage
+- Uses class components (educational purpose)
+- Resolves properties where next API calls are needed
+- Filters and serach data
+
+#### 🛸 Future plans
+
+- Refactor screens to extract common part
+- Add drawer with navigation
+- Add more filters

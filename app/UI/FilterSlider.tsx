@@ -55,5 +55,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: 80,
   },
-  track: { borderRadius: 2, height: 30 },
+  track: {
+    borderRadius: 2,
+    height: 30,
+  },
 });
