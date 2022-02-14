@@ -22,7 +22,7 @@
 
 Use those credentials to login to the app:
 
-- Login: Woo
+- Login: Wooo
 - Password: kiee
 
 #### 🔍 About project
@@ -31,7 +31,7 @@ It's my first contact with react native and mobile development. The project cont
 
 - Fetches data from [Star War API](https://swapi.dev/)
 - Saves API data to Async Storage
-- Contains mock authentication which saves token in Secure Storage
+- Contains mock authentication which saves token in Secure Store
 - Uses class components (educational purpose)
 - Resolves properties where next API calls are needed
 - Filters and serach data

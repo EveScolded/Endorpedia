@@ -17,6 +17,7 @@ interface AuthState {
   password: string;
   icon: string;
   isHidden: boolean;
+  invalidLogIn: boolean;
 }
 
 interface IAuthProps {
@@ -34,6 +35,7 @@ export default class Autenthication extends Component<IAuthProps, AuthState> {
       password: "",
       icon: "eye-slash",
       isHidden: true,
+      invalidLogIn: false,
     };
   }
   private changeIcon = () => {
@@ -44,10 +46,13 @@ export default class Autenthication extends Component<IAuthProps, AuthState> {
   };
 
   private onLogIn = () => {
-    if (this.state.login === "Wooo" && this.state.password === "kiee") {
-      this.authenticator.setToken();
+    try {
+      this.authenticator.setToken(this.state.login, this.state.password);
+      this.props.navigation.navigate("Start");
+      this.setState({ invalidLogIn: false });
+    } catch (e) {
+      this.setState({ invalidLogIn: true });
     }
-    throw "Invalid login or password";
   };
 
   async componentDidMount(): Promise<void> {
@@ -70,6 +75,13 @@ export default class Autenthication extends Component<IAuthProps, AuthState> {
           style={styles.imageBackground}
         >
           <View style={styles.content}>
+            {this.state.invalidLogIn && (
+              <Text style={styles.loginErrorMsg}>
+                {
+                  "Invalid login or password. Try login: 'Wooo' and password: 'kiee'."
+                }
+              </Text>
+            )}
             <View style={styles.inputContainer}>
               <TextInput
                 style={{ width: "100%" }}
@@ -144,5 +156,12 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 18,
     textAlign: "center",
+  },
+  loginErrorMsg: {
+    color: "red",
+    backgroundColor: colors.mainBackground,
+    borderColor: "red",
+    borderWidth: 1,
+    padding: 6,
   },
 });
