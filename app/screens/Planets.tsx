@@ -155,11 +155,11 @@ export default class People extends Component<IPlanetsProps, State> {
     );
   };
 
-  componentDidMount() {
+  public componentDidMount() {
     this.getPlanets();
   }
 
-  render() {
+  public render() {
     const { data, isLoading } = this.state;
     const diameter: number[] = this.getDiameter(data);
     const maxDiameter = diameter.length > 0 ? Math.max(...diameter) : 100;

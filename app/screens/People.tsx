@@ -126,11 +126,11 @@ export default class People extends Component<IPeopleProps, State> {
     );
   };
 
-  componentDidMount() {
+  public componentDidMount() {
     this.getPeople();
   }
 
-  render() {
+  public render() {
     const { data, isLoading } = this.state;
 
     return (

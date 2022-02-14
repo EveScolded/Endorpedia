@@ -55,7 +55,7 @@ export default class Autenthication extends Component<IAuthProps, AuthState> {
     }
   };
 
-  async componentDidMount(): Promise<void> {
+  public async componentDidMount(): Promise<void> {
     try {
       const token = await this.authenticator.getToken();
       if (token) {
@@ -66,7 +66,7 @@ export default class Autenthication extends Component<IAuthProps, AuthState> {
     }
   }
 
-  render() {
+  public render() {
     return (
       <View style={styles.container}>
         <ImageBackground

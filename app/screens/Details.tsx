@@ -52,6 +52,18 @@ export default class Details extends Component<IDetailsProps, State> {
     }
   };
 
+  private renderMultilineProperty = (array) => {
+    return array.length > 0 ? (
+      <FlatList
+        data={array}
+        keyExtractor={(_arrayItem, index) => index.toString()}
+        renderItem={({ item }) => <View>{item}</View>}
+      />
+    ) : (
+      <Text style={styles.detailValue}>{"n/a"}</Text>
+    );
+  };
+
   private renderDetail = (propName: string) => {
     const header =
       propName[0].toUpperCase() + propName.slice(1).replaceAll("_", " ");
@@ -60,17 +72,8 @@ export default class Details extends Component<IDetailsProps, State> {
     return (
       <View style={styles.details}>
         <Text style={styles.detailName}>{header}:</Text>
-
         {Array.isArray(this.state.newDetails[propName]) ? (
-          this.state.newDetails[propName].length > 0 ? (
-            <FlatList
-              data={this.state.newDetails[propName]}
-              keyExtractor={(_arrayItem, index) => index.toString()}
-              renderItem={({ item }) => <View>{item}</View>}
-            />
-          ) : (
-            <Text style={styles.detailValue}>{"n/a"}</Text>
-          )
+          this.renderMultilineProperty(this.state.newDetails[propName])
         ) : (
           <Text style={styles.detailValue}>
             {this.state.newDetails[propName]}
@@ -80,7 +83,7 @@ export default class Details extends Component<IDetailsProps, State> {
     );
   };
 
-  async componentDidMount(): Promise<void> {
+  public async componentDidMount(): Promise<void> {
     const { details } = this.props.route.params;
     const newDetails = { ...details };
 
@@ -105,7 +108,7 @@ export default class Details extends Component<IDetailsProps, State> {
     this.setState({ newDetails: newDetails });
   }
 
-  render() {
+  public render() {
     return (
       <View style={styles.detailsContainer}>
         <FlatList

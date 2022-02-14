@@ -127,11 +127,11 @@ export default class Species extends Component<ISpeciesProps, State> {
     );
   };
 
-  componentDidMount() {
+  public componentDidMount() {
     this.getSpecies();
   }
 
-  render() {
+  public render() {
     const { data, isLoading } = this.state;
 
     return (

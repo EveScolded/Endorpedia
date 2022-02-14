@@ -138,11 +138,11 @@ export default class People extends Component<IStarshipProps, State> {
     );
   };
 
-  componentDidMount() {
+  public componentDidMount() {
     this.getStarship();
   }
 
-  render() {
+  public render() {
     const { data, isLoading } = this.state;
 
     return (
