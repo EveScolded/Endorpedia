@@ -8,7 +8,6 @@ import Card from "../UI/Card";
 import { NavigationProp } from "@react-navigation/native";
 import SearchInput from "../UI/SearchInput";
 import Dropdown from "../UI/Dropdown";
-import FilterSlider from "../UI/FilterSlider";
 
 interface State {
   data: IStarship[];
@@ -110,7 +109,8 @@ export default class People extends Component<IStarshipProps, State> {
   private filterStarship = () => {
     if (this.state.pickerSelectedValue !== "all") {
       let filteredData = this.state.originalData.filter(
-        (item) => item.starship_class === this.state.pickerSelectedValue
+        (item) =>
+          item.starship_class.toLowerCase() === this.state.pickerSelectedValue
       );
       this.setState({ data: filteredData });
     } else {

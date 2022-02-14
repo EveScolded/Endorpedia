@@ -69,7 +69,9 @@ export default class Vehicles extends Component<IVehiclesProps, State> {
           {
             originalData: combinedResults,
             pickerData: [
-              ...new Set(combinedResults.map((item) => item.vehicle_class)),
+              ...new Set(
+                combinedResults.map((item) => item.vehicle_class.toLowerCase())
+              ),
             ],
           },
           () => this.getNextPage(response)
