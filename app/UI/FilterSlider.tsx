@@ -1,4 +1,4 @@
-import { Component } from "react";
+import React, { Component } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Slider } from "@miblanchard/react-native-slider";
 import colors from "../config/colors";
