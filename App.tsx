@@ -3,6 +3,7 @@ import StartScreen from "./app/screens/StartScreen";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import People from "./app/screens/People";
+import People2 from "./app/screens/People2";
 import Details from "./app/screens/Details";
 import { SwapiService } from "./app/service/SwapiService";
 import { CacheService } from "./app/service/CacheService";
@@ -44,7 +45,7 @@ export default function App() {
         />
         <Stack.Screen
           name="People"
-          component={People}
+          component={People2}
           initialParams={{ dataService: swapiService }}
         />
         <Stack.Screen

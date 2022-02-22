@@ -4,9 +4,10 @@ import colors from "../config/colors";
 
 interface CardProps {
   itemName: string;
-  propertyOne: string[] | string;
-  propertyTwo: string[] | string;
-  propertyThree: string[] | string;
+  properties: string[][];
+  // propertyOne?: string[] | string;
+  // propertyTwo?: string[] | string;
+  // propertyThree?: string[] | string;
   onClick: () => void;
 }
 
@@ -25,13 +26,13 @@ export default class Card extends Component<CardProps, {}> {
             {this.props.itemName}
           </Text>
           <Text style={styles.item}>
-            {this.props.propertyOne[0]}: {this.props.propertyOne[1]}
+            {this.props.properties[0][0]}: {this.props.properties[0][1]}
           </Text>
           <Text style={styles.item}>
-            {this.props.propertyTwo[0]}: {this.props.propertyTwo[1]}
+            {this.props.properties[1][0]}: {this.props.properties[1][1]}
           </Text>
           <Text style={styles.item}>
-            {this.props.propertyThree[0]}: {this.props.propertyThree[1]}
+            {this.props.properties[2][0]}: {this.props.properties[2][1]}
           </Text>
         </View>
       </TouchableHighlight>
