@@ -5,6 +5,7 @@ import { StarshipsService } from "../service/StarshipsService";
 import SearchInput from "../UI/SearchInput";
 import Dropdown from "../UI/Dropdown";
 import Base, { BaseState } from "./Base";
+import ResetFilterBtn from "../UI/ResetFiltersBtn";
 
 interface State extends BaseState {
   data: IStarship[];
@@ -112,9 +113,18 @@ export default class People extends Base<State> {
     ];
   };
 
+  private resetFilters = () => {
+    this.setState({
+      data: this.state.originalData,
+      search: "",
+      pickerSelectedValue: "all",
+    });
+  };
+
   protected renderCustomFilters() {
     return (
       <>
+        <ResetFilterBtn onResetFilters={this.resetFilters} />
         <SearchInput
           placeholderText={"name or model"}
           onSearchInput={this.onSearchDetail}

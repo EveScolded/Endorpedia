@@ -3,7 +3,6 @@ import { ActivityIndicator, FlatList, View, StyleSheet } from "react-native";
 import colors from "../config/colors";
 import Card from "../UI/Card";
 import { NavigationProp } from "@react-navigation/native";
-import SearchInput from "../UI/SearchInput";
 
 export interface BaseState {
   data: any[];

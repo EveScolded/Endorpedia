@@ -5,6 +5,7 @@ import { SpeciesService } from "../service/SpeciesService";
 import SearchInput from "../UI/SearchInput";
 import Dropdown from "../UI/Dropdown";
 import Base, { BaseState } from "./Base";
+import ResetFilterBtn from "../UI/ResetFiltersBtn";
 
 interface State extends BaseState {
   data: ISpecies[];
@@ -104,9 +105,17 @@ export default class Species extends Base<State> {
     ];
   };
 
+  private resetFilters = () => {
+    this.setState({
+      data: this.state.originalData,
+      search: "",
+      pickerSelectedValue: "all",
+    });
+  };
   protected renderCustomFilters() {
     return (
       <>
+        <ResetFilterBtn onResetFilters={this.resetFilters} />
         <SearchInput
           placeholderText={"name"}
           onSearchInput={this.onSearchDetail}

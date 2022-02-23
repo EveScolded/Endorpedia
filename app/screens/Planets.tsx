@@ -6,6 +6,7 @@ import SearchInput from "../UI/SearchInput";
 import Dropdown from "../UI/Dropdown";
 import FilterSlider from "../UI/FilterSlider";
 import Base, { BaseState } from "./Base";
+import ResetFilterBtn from "../UI/ResetFiltersBtn";
 
 interface State extends BaseState {
   data: IPlanet[];
@@ -139,9 +140,18 @@ export default class People extends Base<State> {
     ];
   };
 
+  private resetFilters = () => {
+    this.setState({
+      data: this.state.originalData,
+      search: "",
+      pickerSelectedValue: "all",
+      sliderValue: 0,
+    });
+  };
   protected renderCustomFilters() {
     return (
       <>
+        <ResetFilterBtn onResetFilters={this.resetFilters} />
         <SearchInput
           placeholderText={"name"}
           onSearchInput={this.onSearchDetail}

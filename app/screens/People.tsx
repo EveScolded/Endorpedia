@@ -1,10 +1,13 @@
 import React from "react";
+import { Text, TouchableHighlight, StyleSheet } from "react-native";
 import { IPerson } from "../model/IPerson";
 import { IDataSW } from "../model/IDataSW";
 import { PeopleService } from "../service/PeopleService";
 import SearchInput from "../UI/SearchInput";
 import Dropdown from "../UI/Dropdown";
 import Base, { BaseState } from "./Base";
+import colors from "../config/colors";
+import ResetFilterBtn from "../UI/ResetFiltersBtn";
 
 interface State extends BaseState {
   data: IPerson[];
@@ -104,9 +107,18 @@ export default class People extends Base<State> {
     ];
   };
 
+  private resetFilters = () => {
+    this.setState({
+      data: this.state.originalData,
+      search: "",
+      pickerSelectedValue: "all",
+    });
+  };
+
   protected renderCustomFilters() {
     return (
       <>
+        <ResetFilterBtn onResetFilters={this.resetFilters} />
         <SearchInput
           placeholderText={"name"}
           onSearchInput={this.onSearchDetail}
