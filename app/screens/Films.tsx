@@ -1,39 +1,32 @@
-import React, { Component } from "react";
-import { ActivityIndicator, FlatList, View, StyleSheet } from "react-native";
+import React from "react";
 import { IFilm } from "../model/IFilm";
 import { IDataSW } from "../model/IDataSW";
 import { FilmsService } from "../service/FilmsService";
-import colors from "../config/colors";
-import Card from "../UI/Card";
-import { NavigationProp } from "@react-navigation/native";
+import Base, { BaseState } from "./Base";
 
-interface State {
-  originalData: IFilm[];
-  isLoading: boolean;
+interface State extends BaseState {
+  data: IFilm[];
 }
 
-interface IFilmsProps {
-  navigation: NavigationProp<any>;
-}
-export default class Films extends Component<IFilmsProps, State> {
-  private filmsService: FilmsService;
+export default class Films extends Base<State> {
+  protected detailsService: FilmsService;
 
   constructor(props) {
     super(props);
-    this.filmsService = new FilmsService(props.route.params.dataService);
+    this.detailsService = new FilmsService(props.route.params.dataService);
 
     this.state = {
-      originalData: [],
+      data: [],
       isLoading: true,
     };
   }
 
-  private async getFilms() {
+  protected async getData() {
     try {
-      const response: IDataSW<IFilm[]> = await this.filmsService.getFilms();
+      const response: IDataSW<IFilm[]> = await this.detailsService.getFilms();
       this.setState(
         {
-          originalData: response.results,
+          data: response.results,
         },
         () => this.getNextPage(response)
       );
@@ -43,18 +36,18 @@ export default class Films extends Component<IFilmsProps, State> {
       this.setState({ isLoading: false });
     }
   }
+  protected searchDetail = () => {
+    return null;
+  };
 
-  private getNextPage = async (previousResponse: IDataSW<IFilm[]>) => {
+  protected getNextPage = async (previousResponse: IDataSW<IFilm[]>) => {
     if (previousResponse.next) {
       try {
-        const response: IDataSW<IFilm[]> = await this.filmsService.getMore(
+        const response: IDataSW<IFilm[]> = await this.detailsService.getMore(
           previousResponse.next
         );
-        const combinedResults = [
-          ...this.state.originalData,
-          ...response.results,
-        ];
-        this.setState({ originalData: combinedResults }, () =>
+        const combinedResults = [...this.state.data, ...response.results];
+        this.setState({ data: combinedResults }, () =>
           this.getNextPage(response)
         );
       } catch (error) {
@@ -63,58 +56,13 @@ export default class Films extends Component<IFilmsProps, State> {
     }
   };
 
-  private goToDetails = (clickedItem) => {
-    this.props.navigation.navigate("Details", {
-      details: clickedItem,
-    });
-  };
-
   private romans = [0, "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX"];
 
-  private renderCard = (item) => {
-    return (
-      <Card
-        itemName={item.title}
-        propertyOne={["Episode", this.romans[item.episode_id].toLocaleString()]}
-        propertyTwo={["Director", item.director]}
-        propertyThree={["Release date", item.release_date]}
-        onClick={() => this.goToDetails(item)}
-      ></Card>
-    );
+  protected renderItemContent = (item) => {
+    return [
+      ["Episode", this.romans[item.episode_id].toLocaleString()],
+      ["Director", item.director],
+      ["Release date", item.release_date],
+    ];
   };
-
-  componentDidMount() {
-    this.getFilms();
-  }
-
-  render() {
-    const { originalData, isLoading } = this.state;
-
-    return (
-      <View style={styles.container}>
-        {isLoading ? (
-          <ActivityIndicator />
-        ) : (
-          <FlatList
-            data={originalData.sort((a, b) => a.episode_id - b.episode_id)}
-            keyExtractor={(item) => item.url}
-            extraData={originalData}
-            renderItem={({ item }) => this.renderCard(item)}
-          />
-        )}
-      </View>
-    );
-  }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.mainBackground,
-    alignItems: "center",
-  },
-  buttonText: {
-    textAlign: "center",
-    fontWeight: "bold",
-  },
-});

@@ -1,34 +1,24 @@
-import React, { Component } from "react";
-import { ActivityIndicator, FlatList, View, StyleSheet } from "react-native";
+import React from "react";
 import { IStarship } from "../model/IStarship";
 import { IDataSW } from "../model/IDataSW";
 import { StarshipsService } from "../service/StarshipsService";
-import colors from "../config/colors";
-import Card from "../UI/Card";
-import { NavigationProp } from "@react-navigation/native";
 import SearchInput from "../UI/SearchInput";
 import Dropdown from "../UI/Dropdown";
+import Base, { BaseState } from "./Base";
 
-interface State {
+interface State extends BaseState {
   data: IStarship[];
   originalData: IStarship[];
-  isLoading: boolean;
-  search: string;
   pickerSelectedValue: string;
   pickerData: string[];
 }
 
-interface IStarshipProps {
-  navigation: NavigationProp<any>;
-}
-export default class People extends Component<IStarshipProps, State> {
-  private starshipsService: StarshipsService;
+export default class People extends Base<State> {
+  protected detailsService: StarshipsService;
 
   constructor(props) {
     super(props);
-    this.starshipsService = new StarshipsService(
-      props.route.params.dataService
-    );
+    this.detailsService = new StarshipsService(props.route.params.dataService);
 
     this.state = {
       data: [],
@@ -40,17 +30,17 @@ export default class People extends Component<IStarshipProps, State> {
     };
   }
 
-  private async getStarship() {
+  protected async getData() {
     try {
       const response: IDataSW<IStarship[]> =
-        await this.starshipsService.getStarship();
+        await this.detailsService.getStarship();
       this.setState(
         {
           originalData: response.results,
         },
         () => this.getNextPage(response)
       );
-      this.filterStarship();
+      this.filterDetails();
     } catch (error) {
       console.log(error);
     } finally {
@@ -62,7 +52,7 @@ export default class People extends Component<IStarshipProps, State> {
     if (previousResponse.next) {
       try {
         const response: IDataSW<IStarship[]> =
-          await this.starshipsService.getMore(previousResponse.next);
+          await this.detailsService.getMore(previousResponse.next);
         const combinedResults = [...this.state.data, ...response.results];
         this.setState(
           {
@@ -75,42 +65,33 @@ export default class People extends Component<IStarshipProps, State> {
           },
           () => this.getNextPage(response)
         );
-        this.filterStarship();
+        this.filterDetails();
       } catch (error) {
         console.log(error);
       }
     }
   };
 
-  private searchStarship = async () => {
+  protected searchDetail = async () => {
     try {
       const response: IDataSW<IStarship[]> =
-        await this.starshipsService.searchStarship(this.state.search);
+        await this.detailsService.searchStarship(this.state.search);
       this.setState({ data: response.results });
     } catch (error) {
       console.log(error);
     }
   };
 
-  private goToDetails = (clickedItem) => {
-    this.props.navigation.navigate("Details", {
-      details: clickedItem,
-    });
-  };
-
-  private onSearchStarship = (search) => {
-    this.setState({ search });
-  };
-
   private onSetPickerSelectedValue = (pickerSelectedValue) => {
-    this.setState({ pickerSelectedValue }, this.filterStarship);
+    this.setState({ pickerSelectedValue }, this.filterDetails);
   };
 
-  private filterStarship = () => {
+  protected filterDetails = () => {
     if (this.state.pickerSelectedValue !== "all") {
       let filteredData = this.state.originalData.filter(
-        (item) =>
-          item.starship_class.toLowerCase() === this.state.pickerSelectedValue
+        (filterItem) =>
+          filterItem.starship_class.toLowerCase() ===
+          this.state.pickerSelectedValue
       );
       this.setState({ data: filteredData });
     } else {
@@ -118,66 +99,33 @@ export default class People extends Component<IStarshipProps, State> {
     }
   };
 
-  private renderCard = (item) => {
-    return (
-      <Card
-        itemName={item.name}
-        propertyOne={[
-          "Cost in credits",
-          !isNaN(Number(item.cost_in_credits))
-            ? Number(item.cost_in_credits).toLocaleString()
-            : item.cost_in_credits,
-        ]}
-        propertyTwo={[
-          "Length",
-          Number(item.length.replace(".", "")).toLocaleString(),
-        ]}
-        propertyThree={["Crew", item.crew.replace(",", " ")]}
-        onClick={() => this.goToDetails(item)}
-      ></Card>
-    );
+  protected renderItemContent = (item) => {
+    return [
+      [
+        "Cost in credits",
+        !isNaN(Number(item.cost_in_credits))
+          ? Number(item.cost_in_credits).toLocaleString()
+          : item.cost_in_credits,
+      ],
+      ["Length", Number(item.length.replace(".", "")).toLocaleString()],
+      ["Crew", item.crew.replace(",", " ")],
+    ];
   };
 
-  public componentDidMount() {
-    this.getStarship();
-  }
-
-  public render() {
-    const { data, isLoading } = this.state;
-
+  protected renderCustomFilters() {
     return (
-      <View style={styles.container}>
+      <>
         <SearchInput
           placeholderText={"name or model"}
-          onSearchInput={this.onSearchStarship}
-          searchItem={this.searchStarship}
+          onSearchInput={this.onSearchDetail}
+          searchItem={this.searchDetail}
         />
         <Dropdown
           pickerData={["all", ...this.state.pickerData]}
           pickerSelectedValue={this.state.pickerSelectedValue}
           onSetPickerSelectedValue={this.onSetPickerSelectedValue}
         />
-        {isLoading ? (
-          <ActivityIndicator />
-        ) : (
-          <FlatList
-            columnWrapperStyle={{ justifyContent: "space-between" }}
-            numColumns={2}
-            data={data}
-            keyExtractor={(item) => item.url}
-            extraData={data}
-            renderItem={({ item }) => this.renderCard(item)}
-          />
-        )}
-      </View>
+      </>
     );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.mainBackground,
-    alignItems: "center",
-  },
-});

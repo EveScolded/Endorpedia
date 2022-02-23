@@ -7,9 +7,9 @@ import SearchInput from "../UI/SearchInput";
 
 export interface BaseState {
   data: any[];
-  originalData: any[];
+  originalData?: any[];
   isLoading: boolean;
-  search: string;
+  search?: string;
 }
 
 interface BaseStateProps {
@@ -43,7 +43,7 @@ export default abstract class Base<T extends BaseState> extends Component<
     });
   };
 
-  private onSearchDetail = (search) => {
+  protected onSearchDetail = (search) => {
     this.setState({ search });
   };
 
@@ -52,7 +52,7 @@ export default abstract class Base<T extends BaseState> extends Component<
   private renderCard = (item) => {
     return (
       <Card
-        itemName={item.name}
+        itemName={item.name === undefined ? item.title : item.name}
         properties={this.renderItemContent(item)}
         onClick={() => this.goToDetails(item)}
       ></Card>
@@ -72,11 +72,6 @@ export default abstract class Base<T extends BaseState> extends Component<
 
     return (
       <View style={styles.container}>
-        <SearchInput
-          placeholderText={"name"}
-          onSearchInput={this.onSearchDetail}
-          searchItem={this.searchDetail}
-        />
         {this.renderCustomFilters()}
         {isLoading ? (
           <ActivityIndicator />

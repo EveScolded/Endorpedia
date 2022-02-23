@@ -14,6 +14,6 @@ export class PlanetsService {
   }
 
   public searchPlanet(query: string) {
-    return this.dataService.getData("planet/?search=" + query);
+    return this.dataService.getData("planets/?search=" + query);
   }
 }

@@ -1,32 +1,23 @@
-import React, { Component } from "react";
-import { ActivityIndicator, FlatList, View, StyleSheet } from "react-native";
+import React from "react";
 import { ISpecies } from "../model/ISpecies";
 import { IDataSW } from "../model/IDataSW";
 import { SpeciesService } from "../service/SpeciesService";
-import colors from "../config/colors";
-import Card from "../UI/Card";
-import { NavigationProp } from "@react-navigation/native";
 import SearchInput from "../UI/SearchInput";
 import Dropdown from "../UI/Dropdown";
+import Base, { BaseState } from "./Base";
 
-interface State {
+interface State extends BaseState {
   data: ISpecies[];
   originalData: ISpecies[];
-  isLoading: boolean;
-  search: string;
   pickerSelectedValue: string;
   pickerData: string[];
 }
-
-interface ISpeciesProps {
-  navigation: NavigationProp<any>;
-}
-export default class Species extends Component<ISpeciesProps, State> {
-  private speciesService: SpeciesService;
+export default class Species extends Base<State> {
+  protected detailsService: SpeciesService;
 
   constructor(props) {
     super(props);
-    this.speciesService = new SpeciesService(props.route.params.dataService);
+    this.detailsService = new SpeciesService(props.route.params.dataService);
 
     this.state = {
       data: [],
@@ -38,17 +29,17 @@ export default class Species extends Component<ISpeciesProps, State> {
     };
   }
 
-  private async getSpecies() {
+  protected async getData() {
     try {
       const response: IDataSW<ISpecies[]> =
-        await this.speciesService.getSpecies();
+        await this.detailsService.getSpecies();
       this.setState(
         {
           originalData: response.results,
         },
         () => this.getNextPage(response)
       );
-      this.filterSpecies(this.state.pickerSelectedValue);
+      this.filterDetails();
     } catch (error) {
       console.log(error);
     } finally {
@@ -56,10 +47,10 @@ export default class Species extends Component<ISpeciesProps, State> {
     }
   }
 
-  private getNextPage = async (previousResponse: IDataSW<ISpecies[]>) => {
+  protected getNextPage = async (previousResponse: IDataSW<ISpecies[]>) => {
     if (previousResponse.next) {
       try {
-        const response: IDataSW<ISpecies[]> = await this.speciesService.getMore(
+        const response: IDataSW<ISpecies[]> = await this.detailsService.getMore(
           previousResponse.next
         );
         const combinedResults = [...this.state.data, ...response.results];
@@ -72,42 +63,32 @@ export default class Species extends Component<ISpeciesProps, State> {
           },
           () => this.getNextPage(response)
         );
-        this.filterSpecies(this.state.pickerSelectedValue);
+        this.filterDetails();
       } catch (error) {
         console.log(error);
       }
     }
   };
 
-  private searchSpecies = async () => {
+  protected searchDetail = async () => {
     try {
       const response: IDataSW<ISpecies[]> =
-        await this.speciesService.searchSpecies(this.state.search);
+        await this.detailsService.searchSpecies(this.state.search);
       this.setState({ data: response.results });
     } catch (error) {
       console.log(error);
     }
   };
 
-  private goToDetails = (clickedItem) => {
-    this.props.navigation.navigate("Details", {
-      details: clickedItem,
-    });
+  protected onSetPickerSelectedValue = (pickerSelectedValue) => {
+    this.setState({ pickerSelectedValue }, this.filterDetails);
   };
 
-  private onSearchPerson = (search) => {
-    this.setState({ search });
-  };
-
-  private onSetPickerSelectedValue = (pickerSelectedValue) => {
-    this.setState({ pickerSelectedValue });
-    this.filterSpecies(pickerSelectedValue);
-  };
-
-  private filterSpecies = (selectedOption) => {
-    if (selectedOption !== "all") {
+  protected filterDetails = () => {
+    if (this.state.pickerSelectedValue !== "all") {
       let filteredData = this.state.originalData.filter(
-        (item) => item.classification === selectedOption
+        (filterItem) =>
+          filterItem.classification === this.state.pickerSelectedValue
       );
       this.setState({ data: filteredData });
     } else {
@@ -115,58 +96,28 @@ export default class Species extends Component<ISpeciesProps, State> {
     }
   };
 
-  private renderCard = (item) => {
-    return (
-      <Card
-        itemName={item.name}
-        propertyOne={["Classification", item.classification]}
-        propertyTwo={["Average height", item.average_height]}
-        propertyThree={["Average lifespan", item.average_lifespan]}
-        onClick={() => this.goToDetails(item)}
-      ></Card>
-    );
+  protected renderItemContent = (item) => {
+    return [
+      ["Classification", item.classification],
+      ["Average height", item.average_height],
+      ["Average lifespan", item.average_lifespan],
+    ];
   };
 
-  public componentDidMount() {
-    this.getSpecies();
-  }
-
-  public render() {
-    const { data, isLoading } = this.state;
-
+  protected renderCustomFilters() {
     return (
-      <View style={styles.container}>
+      <>
         <SearchInput
           placeholderText={"name"}
-          onSearchInput={this.onSearchPerson}
-          searchItem={this.searchSpecies}
+          onSearchInput={this.onSearchDetail}
+          searchItem={this.searchDetail}
         />
         <Dropdown
           pickerData={["all", ...this.state.pickerData]}
           pickerSelectedValue={this.state.pickerSelectedValue}
           onSetPickerSelectedValue={this.onSetPickerSelectedValue}
         />
-        {isLoading ? (
-          <ActivityIndicator />
-        ) : (
-          <FlatList
-            columnWrapperStyle={{ justifyContent: "space-between" }}
-            numColumns={2}
-            data={data}
-            keyExtractor={(item) => item.url}
-            extraData={data}
-            renderItem={({ item }) => this.renderCard(item)}
-          />
-        )}
-      </View>
+      </>
     );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.mainBackground,
-    alignItems: "center",
-  },
-});
