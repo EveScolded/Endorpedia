@@ -6,6 +6,7 @@ import SearchInput from "../UI/SearchInput";
 import Dropdown from "../UI/Dropdown";
 import Base, { BaseState } from "./Base";
 import ResetFilterBtn from "../UI/ResetFiltersBtn";
+import { View } from "react-native";
 
 interface State extends BaseState {
   data: IStarship[];
@@ -124,17 +125,19 @@ export default class People extends Base<State> {
   protected renderCustomFilters() {
     return (
       <>
-        <ResetFilterBtn onResetFilters={this.resetFilters} />
         <SearchInput
           placeholderText={"name or model"}
           onSearchInput={this.onSearchDetail}
           searchItem={this.searchDetail}
         />
-        <Dropdown
-          pickerData={["all", ...this.state.pickerData]}
-          pickerSelectedValue={this.state.pickerSelectedValue}
-          onSetPickerSelectedValue={this.onSetPickerSelectedValue}
-        />
+        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+          <Dropdown
+            pickerData={["all", ...this.state.pickerData]}
+            pickerSelectedValue={this.state.pickerSelectedValue}
+            onSetPickerSelectedValue={this.onSetPickerSelectedValue}
+          />
+          <ResetFilterBtn onResetFilters={this.resetFilters} />
+        </View>
       </>
     );
   }

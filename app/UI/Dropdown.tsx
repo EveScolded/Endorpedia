@@ -38,5 +38,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
     color: "white",
   },
-  picker: { height: 50, width: 170, backgroundColor: colors.picker },
+  picker: { height: 50, width: 170, margin: 6, backgroundColor: colors.picker },
 });

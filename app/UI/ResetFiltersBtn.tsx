@@ -22,10 +22,10 @@ const styles = StyleSheet.create({
   text: {
     textAlign: "center",
     backgroundColor: colors.mainBanana,
-    width: 200,
-    height: 50,
+    width: 170,
+    height: 51.6,
+    margin: 6,
     padding: 15,
-    marginTop: 5,
     fontWeight: "bold",
     color: colors.textBlue,
   },

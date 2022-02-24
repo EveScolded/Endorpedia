@@ -7,6 +7,7 @@ import Dropdown from "../UI/Dropdown";
 import FilterSlider from "../UI/FilterSlider";
 import Base, { BaseState } from "./Base";
 import ResetFilterBtn from "../UI/ResetFiltersBtn";
+import { View } from "react-native";
 
 interface State extends BaseState {
   data: IVehicle[];
@@ -157,16 +158,10 @@ export default class Vehicles extends Base<State> {
   protected renderCustomFilters() {
     return (
       <>
-        <ResetFilterBtn onResetFilters={this.resetFilters} />
         <SearchInput
           placeholderText={"name or model"}
           onSearchInput={this.onSearchDetail}
           searchItem={this.searchDetail}
-        />
-        <Dropdown
-          pickerData={["all", ...this.state.pickerData]}
-          pickerSelectedValue={this.state.pickerSelectedValue}
-          onSetPickerSelectedValue={this.onSetPickerSelectedValue}
         />
         <FilterSlider
           thumbTitle={"Cost in credits"}
@@ -175,6 +170,14 @@ export default class Vehicles extends Base<State> {
           min={0}
           onValueChange={this.onSliderValueChange}
         />
+        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+          <Dropdown
+            pickerData={["all", ...this.state.pickerData]}
+            pickerSelectedValue={this.state.pickerSelectedValue}
+            onSetPickerSelectedValue={this.onSetPickerSelectedValue}
+          />
+          <ResetFilterBtn onResetFilters={this.resetFilters} />
+        </View>
       </>
     );
   }

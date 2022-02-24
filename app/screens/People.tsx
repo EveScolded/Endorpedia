@@ -1,5 +1,5 @@
 import React from "react";
-import { Text, TouchableHighlight, StyleSheet } from "react-native";
+import { Text, TouchableHighlight, StyleSheet, View } from "react-native";
 import { IPerson } from "../model/IPerson";
 import { IDataSW } from "../model/IDataSW";
 import { PeopleService } from "../service/PeopleService";
@@ -118,17 +118,19 @@ export default class People extends Base<State> {
   protected renderCustomFilters() {
     return (
       <>
-        <ResetFilterBtn onResetFilters={this.resetFilters} />
         <SearchInput
           placeholderText={"name"}
           onSearchInput={this.onSearchDetail}
           searchItem={this.searchDetail}
         />
-        <Dropdown
-          pickerData={["all", ...this.state.pickerData]}
-          pickerSelectedValue={this.state.pickerSelectedValue}
-          onSetPickerSelectedValue={this.onSetPickerSelectedValue}
-        />
+        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+          <Dropdown
+            pickerData={["all", ...this.state.pickerData]}
+            pickerSelectedValue={this.state.pickerSelectedValue}
+            onSetPickerSelectedValue={this.onSetPickerSelectedValue}
+          />
+          <ResetFilterBtn onResetFilters={this.resetFilters} />
+        </View>
       </>
     );
   }
