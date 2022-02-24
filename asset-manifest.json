@@ -1,23 +1,23 @@
 {
   "files": {
-    "app.js": "/Endorpedia/static/js/app.5d85afdd.chunk.js",
-    "app.js.map": "/Endorpedia/static/js/app.5d85afdd.chunk.js.map",
+    "app.js": "/Endorpedia/static/js/app.09b232f2.chunk.js",
+    "app.js.map": "/Endorpedia/static/js/app.09b232f2.chunk.js.map",
     "runtime~app.js": "/Endorpedia/static/js/runtime~app.792c4645.js",
     "runtime~app.js.map": "/Endorpedia/static/js/runtime~app.792c4645.js.map",
-    "static/js/2.02e9163f.chunk.js": "/Endorpedia/static/js/2.02e9163f.chunk.js",
-    "static/js/2.02e9163f.chunk.js.map": "/Endorpedia/static/js/2.02e9163f.chunk.js.map",
+    "static/js/2.2a4d9642.chunk.js": "/Endorpedia/static/js/2.2a4d9642.chunk.js",
+    "static/js/2.2a4d9642.chunk.js.map": "/Endorpedia/static/js/2.2a4d9642.chunk.js.map",
     "fonts/FontAwesome.ttf": "/Endorpedia/./fonts/FontAwesome.ttf",
     "index.html": "/Endorpedia/index.html",
     "manifest.json": "/Endorpedia/manifest.json",
     "serve.json": "/Endorpedia/serve.json",
-    "static/js/2.02e9163f.chunk.js.LICENSE.txt": "/Endorpedia/static/js/2.02e9163f.chunk.js.LICENSE.txt",
+    "static/js/2.2a4d9642.chunk.js.LICENSE.txt": "/Endorpedia/static/js/2.2a4d9642.chunk.js.LICENSE.txt",
     "static/media/background.jpg": "/Endorpedia/static/media/background.4c012343.jpg",
     "static/media/grogu.png": "/Endorpedia/static/media/grogu.633152b2.png",
     "static/media/searchIcon.png": "/Endorpedia/static/media/searchIcon.ed97a9c5.png"
   },
   "entrypoints": [
     "static/js/runtime~app.792c4645.js",
-    "static/js/2.02e9163f.chunk.js",
-    "static/js/app.5d85afdd.chunk.js"
+    "static/js/2.2a4d9642.chunk.js",
+    "static/js/app.09b232f2.chunk.js"
   ]
 }
